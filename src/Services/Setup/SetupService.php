@@ -183,7 +183,13 @@ final class SetupService
             return ['created' => false, 'username' => $username];
         }
 
-        GatewayUsers::query()->create([
+        // forceFill on a NEW model instance: the host User's $fillable is the
+        // HOST's business (often just name/email/password); the installer
+        // writes its own known columns and must not silently lose
+        // username/role to mass-assignment guards.
+        $model = GatewayUsers::model();
+
+        (new $model)->forceFill([
             'name' => $name,
             'username' => $username,
             'email' => $username.'@'.parse_url((string) config('app.url'), PHP_URL_HOST).'.local',
@@ -192,7 +198,7 @@ final class SetupService
             'is_active' => true,
             'email_verified_at' => now(),
             'password' => $password,
-        ]);
+        ])->save();
 
         return ['created' => true, 'username' => $username];
     }
