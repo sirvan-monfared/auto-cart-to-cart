@@ -1,0 +1,69 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "cartbecart/cardpay",
+    "type": "library",
+    "description": "Card-to-card payment gateway for Laravel: HMAC merchant API, hosted checkout, SMS-based matching, admin panel.",
+    "keywords": [
+        "laravel",
+        "payment",
+        "card-to-card",
+        "gateway"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "laravel/fortify": "^1.37.2",
+        "laravel/framework": "^13.17",
+        "livewire/flux": "^2.13.1",
+        "livewire/livewire": "^4.1"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.24",
+        "laravel/pint": "^1.27",
+        "nunomaduro/collision": "^8.9.3",
+        "orchestra/testbench": "^11.2",
+        "pestphp/pest": "^4.7",
+        "pestphp/pest-plugin-laravel": "^4.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "CartBecart\\CardPay\\": "src/",
+            "CartBecart\\CardPay\\Database\\Factories\\": "src/Database/Factories/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CartBecart\\CardPay\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CartBecart\\CardPay\\Providers\\CardPayServiceProvider",
+                "CartBecart\\CardPay\\Providers\\CardPayFortifyServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "lint": [
+            "pint --parallel"
+        ],
+        "lint:check": [
+            "pint --parallel --test"
+        ],
+        "test": [
+            "@php vendor/bin/pest"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

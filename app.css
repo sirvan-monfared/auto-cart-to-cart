@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+/* Persian/Arabic subset of Vazirmatn — bunny's vite plugin only bundles the latin subset. */
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/vazirmatn/vazirmatn-arabic-400-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E, U+2010-2011;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/vazirmatn/vazirmatn-arabic-500-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E, U+2010-2011;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/vazirmatn/vazirmatn-arabic-600-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E, U+2010-2011;
+}
+@font-face {
+    font-family: 'Vazirmatn';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/vazirmatn/vazirmatn-arabic-700-normal.woff2') format('woff2');
+    unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFC, U+200C-200E, U+2010-2011;
+}
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', 'Vazirmatn', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Teal-tinted gray ramp (zinc lightness steps, hue ~180) */
+    --color-zinc-50: #f7fafa;
+    --color-zinc-100: #edf4f4;
+    --color-zinc-200: #dce7e7;
+    --color-zinc-300: #c2d4d3;
+    --color-zinc-400: #9db4b3;
+    --color-zinc-500: #7c9695;
+    --color-zinc-600: #627b7a;
+    --color-zinc-700: #506464;
+    --color-zinc-800: #435352;
+    --color-zinc-900: #3a4746;
+    --color-zinc-950: #1d2625;
+
+    --color-accent: var(--color-teal-600);
+    --color-accent-content: var(--color-teal-600);
+    --color-accent-foreground: var(--color-white);
+
+    --color-surface: #f6fefd;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+}
+
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+@utility panel-card {
+    @apply rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm shadow-teal-900/5;
+}
+
+@utility page-title-row {
+    @apply flex flex-wrap items-start justify-between gap-4;
+}
+
+[dir="rtl"] select[data-flux-select-native] {
+    background-position: left 0.5rem center;
+}

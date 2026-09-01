@@ -1,0 +1,9 @@
+/vendor/
+/node_modules/
+/resources/dist/
+/.phpunit.cache/
+/.phpunit.result.cache
+.phpactor.json
+.phpunit.result.cache
+.DS_Store
+Thumbs.db
