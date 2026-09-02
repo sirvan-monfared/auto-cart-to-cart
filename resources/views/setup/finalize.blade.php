@@ -16,7 +16,7 @@
         <div class="error">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('setup.finalize.complete') }}">
+    <form method="POST" action="{{ cardpay_setup_route('finalize.complete') }}">
         @csrf
         <label for="title">Checkout title (Persian)</label>
         <input id="title" type="text" name="title" maxlength="500" value="{{ old('title', 'پرداخت امن کارت به کارت') }}">

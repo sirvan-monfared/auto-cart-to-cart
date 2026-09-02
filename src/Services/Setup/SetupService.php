@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace CartBecart\CardPay\Services\Setup;
 
-use CartBecart\CardPay\Models\Application;
-use CartBecart\CardPay\Models\ApplicationApiKey;
-use CartBecart\CardPay\Models\BankCard;
 use CartBecart\CardPay\Models\Setting;
-use CartBecart\CardPay\Services\Security\Crypto;
+use CartBecart\CardPay\Services\Provisioning\GatewayProvisioner;
 use CartBecart\CardPay\Support\GatewayUsers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -30,6 +27,8 @@ use Throwable;
  */
 final class SetupService
 {
+    public function __construct(private readonly GatewayProvisioner $provisioner) {}
+
     public function isInstalled(): bool
     {
         return file_exists(storage_path('installed.lock'));
@@ -86,14 +85,33 @@ final class SetupService
         return $requirements['php_ok'] && $requirements['app_key_set'];
     }
 
-    /** Whether any migration table has been created yet (DB untouched?). */
+    /**
+     * Whether the schema has been created yet (DB untouched?). Probes a core
+     * table rather than cp_settings, which is feature-scoped and may not exist.
+     */
     public function databaseMigrated(): bool
     {
         try {
-            return Schema::hasTable('cp_settings');
+            return Schema::hasTable('cp_payments');
         } catch (Throwable) {
             return false;
         }
+    }
+
+    /** Whether the host application already has user accounts. */
+    public function hasHostUsers(): bool
+    {
+        try {
+            return Schema::hasTable('users') && DB::table('users')->exists();
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    /** Whether the admin-creation wizard step should be skipped. */
+    public function shouldSkipAdminStep(): bool
+    {
+        return $this->hasHostUsers() || $this->hasActiveAdmin();
     }
 
     /** Whether an active admin account already exists (adapt-safely skip). */
@@ -226,43 +244,18 @@ final class SetupService
             }
         }
 
-        $result = ['application_created' => false, 'public_key' => null, 'secret' => null];
+        // Shared with `cardpay:install` and the seeder so every path creates
+        // the gateway identically. Idempotent: an existing application is
+        // reported, never re-keyed.
+        $provisioned = $this->provisioner->provision();
+        $application = $provisioned->application;
 
-        $existing = Application::query()->where('slug', 'store')->first();
-        if ($existing === null) {
-            $card = BankCard::query()->where('is_active', true)->first();
-
-            $application = Application::query()->create([
-                'name' => 'Default Store',
-                'slug' => 'store',
-                'public_key' => 'app_'.Str::lower(Str::random(32)),
-                'is_active' => true,
-                'token_digits' => 3,
-                'payment_expiration_minutes' => 30,
-                'default_bank_card_id' => $card?->id,
-            ]);
-
-            $secret = Str::random(48);
-            ApplicationApiKey::query()->create([
-                'application_id' => $application->id,
-                'public_key' => 'pk_'.Str::lower(Str::random(24)),
-                'secret_encrypted' => $secret,
-                'secret_fingerprint' => Crypto::fingerprint($secret),
-                'label' => 'Primary',
-                'is_active' => true,
-            ]);
-
-            $apiKey = $application->apiKeys()->latest('id')->first();
-
-            $result = [
-                'application_created' => true,
-                'public_key' => (string) $application->getAttribute('public_key'),
-                'api_public_key' => $apiKey !== null ? (string) $apiKey->getAttribute('public_key') : null,
-                'secret' => $secret,
-            ];
-        } elseif ($existing instanceof Application) {
-            $result['public_key'] = (string) $existing->getAttribute('public_key');
-        }
+        $result = [
+            'application_created' => $provisioned->created,
+            'public_key' => (string) $application->getAttribute('public_key'),
+            'api_public_key' => $provisioned->credentials?->publicKey,
+            'secret' => $provisioned->credentials?->secret,
+        ];
 
         // Lock LAST: everything above succeeded before the door closes.
         if (! @touch(storage_path('installed.lock'))) {

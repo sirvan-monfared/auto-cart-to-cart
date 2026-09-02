@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CartBecart\CardPay\Concerns;
 
 use CartBecart\CardPay\Contracts\GatewayUser;
+use Illuminate\Support\Str;
 
 /**
  * The ONE code change a host application makes: adopt this trait on its User
@@ -34,10 +35,10 @@ trait IsGatewayUser
      */
     public function initials(): string
     {
-        $initials = \Illuminate\Support\Str::initials($this->name, true);
+        $initials = Str::initials($this->name, true);
 
-        return \Illuminate\Support\Str::length($initials) > 1
-            ? \Illuminate\Support\Str::substr($initials, 0, 1).\Illuminate\Support\Str::substr($initials, -1)
+        return Str::length($initials) > 1
+            ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
     }
 }

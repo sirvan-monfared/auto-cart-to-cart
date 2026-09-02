@@ -25,20 +25,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('v1')->middleware('merchant.hmac')->group(function (): void {
-    Route::post('payments', [PaymentApiController::class, 'store']);
-    Route::get('payments/{payment}', [PaymentApiController::class, 'show']);
-    Route::post('payments/{payment}/verify', [PaymentApiController::class, 'verify']);
-    Route::post('payments/{payment}/cancel', [PaymentApiController::class, 'cancel']);
-});
+if (cardpay_feature('merchant_api')) {
+    Route::prefix('v1')->middleware('merchant.hmac')->group(function (): void {
+        Route::post('payments', [PaymentApiController::class, 'store']);
+        Route::get('payments/{payment}', [PaymentApiController::class, 'show']);
+        Route::post('payments/{payment}/verify', [PaymentApiController::class, 'verify']);
+        Route::post('payments/{payment}/cancel', [PaymentApiController::class, 'cancel']);
+    });
+}
 
-Route::prefix('v1/devices')->group(function (): void {
-    Route::post('incoming-sms', [DeviceSmsController::class, 'incomingSms'])
-        ->middleware('device.hmac');
-    Route::post('shortcut-sms', [DeviceSmsController::class, 'shortcutSms'])
-        ->middleware('device.shortcut');
-});
+if (cardpay_feature('device_api')) {
+    Route::prefix('v1/devices')->group(function (): void {
+        Route::post('incoming-sms', [DeviceSmsController::class, 'incomingSms'])
+            ->middleware('device.hmac');
+        Route::post('shortcut-sms', [DeviceSmsController::class, 'shortcutSms'])
+            ->middleware('device.shortcut');
+    });
+}
 
 // Public checkout polling (§FR-8 #2) — no auth by design; guarded by rate
 // limit + opaque public_id + minimal response body.
-Route::get('v1/public/payments/{publicId}/status', [PublicStatusController::class, 'show']);
+if (cardpay_feature('checkout')) {
+    Route::get('v1/public/payments/{publicId}/status', [PublicStatusController::class, 'show']);
+}

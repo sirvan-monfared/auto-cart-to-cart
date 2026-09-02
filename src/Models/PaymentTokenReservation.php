@@ -6,6 +6,7 @@ namespace CartBecart\CardPay\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * An active amount lock that makes each open payment's payable_amount unique
@@ -19,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $payable_amount
  * @property int $token
  * @property bool|null $active_key
- * @property \Illuminate\Support\Carbon|null $release_at
+ * @property Carbon|null $release_at
  */
 class PaymentTokenReservation extends Model
 {

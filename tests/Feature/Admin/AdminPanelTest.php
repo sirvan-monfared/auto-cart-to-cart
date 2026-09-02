@@ -53,14 +53,14 @@ afterEach(function () {
 it('renders all panel pages for an active admin', function () {
     $this->actingAs($this->admin);
 
-    $this->get('/admin')->assertOk()->assertSee(__('CardPay Admin'));
-    $this->get('/admin/payments')->assertOk()->assertSee($this->payment->public_id);
-    $this->get('/admin/payments/'.$this->payment->public_id)->assertOk()->assertSee(__('Payment').' '.$this->payment->public_id);
-    $this->get('/admin/reviews')->assertOk()->assertSee(__('Manual review queue'));
-    $this->get('/admin/sms-log')->assertOk();
-    $this->get('/admin/sms-log?match=unmatched')->assertOk();
-    $this->get('/admin/webhooks')->assertOk();
-    $this->get('/admin/audit')->assertOk();
+    $this->get(cardpay_test_url())->assertOk()->assertSee(__('CardPay Admin'));
+    $this->get(cardpay_test_url('payments'))->assertOk()->assertSee($this->payment->public_id);
+    $this->get(cardpay_test_url('payments/').$this->payment->public_id)->assertOk()->assertSee(__('Payment').' '.$this->payment->public_id);
+    $this->get(cardpay_test_url('reviews'))->assertOk()->assertSee(__('Manual review queue'));
+    $this->get(cardpay_test_url('sms-log'))->assertOk();
+    $this->get(cardpay_test_url('sms-log?match=unmatched'))->assertOk();
+    $this->get(cardpay_test_url('webhooks'))->assertOk();
+    $this->get(cardpay_test_url('audit'))->assertOk();
 });
 
 it('shows the review in the queue and hides decided ones from pending list', function () {
@@ -72,16 +72,16 @@ it('shows the review in the queue and hides decided ones from pending list', fun
 
     // Pending: appears with its decision forms.
     $pending = $this->actingAs($this->admin)
-        ->get('/admin/reviews')
+        ->get(cardpay_test_url('reviews'))
         ->assertOk();
-    expect(str_contains($pending->getContent(), 'admin.reviews.approve') || str_contains($pending->getContent(), '/admin/reviews/'.$review->id.'/approve'))->toBeTrue();
+    expect(str_contains($pending->getContent(), 'admin.reviews.approve') || str_contains($pending->getContent(), cardpay_test_url('reviews/').$review->id.'/approve'))->toBeTrue();
 
     // Decide it: it leaves the PENDING set (the page's decided list may show
     // it for reference, but the approve/reject form is gone).
     ManualReviewRequest::query()->whereKey($review->id)->update(['status' => 'rejected']);
 
-    $after = $this->actingAs($this->admin)->get('/admin/reviews')->assertOk();
-    expect(str_contains($after->getContent(), '/admin/reviews/'.$review->id.'/approve'))->toBeFalse();
+    $after = $this->actingAs($this->admin)->get(cardpay_test_url('reviews'))->assertOk();
+    expect(str_contains($after->getContent(), cardpay_test_url('reviews/').$review->id.'/approve'))->toBeFalse();
 });
 
 it('shows unmatched SMS in the unmatched explorer', function () {
@@ -98,13 +98,13 @@ it('shows unmatched SMS in the unmatched explorer', function () {
     ]);
 
     $this->actingAs($this->admin)
-        ->get('/admin/sms-log?match=unmatched')
+        ->get(cardpay_test_url('sms-log?match=unmatched'))
         ->assertOk()
         ->assertSee('unmatched');
 });
 
 it('blocks panel pages for guests with a redirect to login', function () {
-    foreach (['/admin', '/admin/payments', '/admin/reviews', '/admin/webhooks', '/admin/audit'] as $path) {
+    foreach ([cardpay_test_url(), cardpay_test_url('payments'), cardpay_test_url('reviews'), cardpay_test_url('webhooks'), cardpay_test_url('audit')] as $path) {
         $this->get($path)->assertRedirect(route('login'));
     }
 });

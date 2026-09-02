@@ -15,18 +15,11 @@ use Illuminate\Validation\Rules\Password;
 /**
  * The guided setup wizard (§FR-1), reachable only while the install lock is
  * absent (the `installed` middleware 404s it afterwards — §SR-16).
- *
- * Four steps, each independently re-runnable:
- *   1. requirements check,
- *   2. database connect + migrate + seed,
- *   3. admin account (skipped automatically when one already exists),
- *   4. store settings + default application + LOCK.
  */
 final class SetupController extends Controller
 {
     public function __construct(private readonly SetupService $setup) {}
 
-    /** Landing page: shows requirements and the step map. */
     public function index(): View
     {
         $requirements = $this->setup->requirements();
@@ -36,6 +29,7 @@ final class SetupController extends Controller
             'requirementsOk' => $this->setup->requirementsSatisfied($requirements),
             'dbMigrated' => $this->setup->databaseMigrated(),
             'hasAdmin' => $this->setup->hasActiveAdmin(),
+            'hasHostUsers' => $this->setup->hasHostUsers(),
         ]);
     }
 
@@ -61,41 +55,46 @@ final class SetupController extends Controller
             return back()->with('setup_error', (string) ($result['error'] ?? 'Unknown setup failure.'));
         }
 
-        return redirect()->route('setup.admin');
+        return redirect()->to($this->setup->shouldSkipAdminStep()
+            ? cardpay_setup_route('finalize')
+            : cardpay_setup_route('admin'));
     }
 
-    public function showAdmin(): View
+    public function showAdmin(): View|RedirectResponse
     {
+        if ($this->setup->shouldSkipAdminStep()) {
+            return redirect()->to(cardpay_setup_route('finalize'));
+        }
+
         return view('cardpay::setup.admin', [
             'hasAdmin' => $this->setup->hasActiveAdmin(),
+            'hasHostUsers' => $this->setup->hasHostUsers(),
         ]);
     }
 
     public function storeAdmin(Request $request): RedirectResponse
     {
-        // An existing active admin makes this step a pass-through.
-        if (! $this->setup->hasActiveAdmin()) {
-            // Normalize BEFORE validating so the unique check is
-            // case-insensitive regardless of the DB's collation.
-            $request->merge(['username' => Str::lower(trim((string) $request->input('username')))]);
-
-            $request->validate([
-                'name' => ['required', 'string', 'max:120'],
-                // §SR-5: min length 10 at install, with confirmation.
-                'password' => ['required', 'string', Password::min(10), 'confirmed'],
-                'username' => ['required', 'alpha_dash', 'min:3', 'max:190', 'unique:users,username'],
-                'mobile' => ['nullable', 'string', 'max:30'],
-            ]);
-
-            $this->setup->createAdmin(
-                name: (string) $request->input('name'),
-                username: (string) $request->input('username'),
-                mobile: (string) $request->input('mobile', ''),
-                password: (string) $request->input('password'),
-            );
+        if ($this->setup->shouldSkipAdminStep()) {
+            return redirect()->to(cardpay_setup_route('finalize'));
         }
 
-        return redirect()->route('setup.finalize');
+        $request->merge(['username' => Str::lower(trim((string) $request->input('username')))]);
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'password' => ['required', 'string', Password::min(10), 'confirmed'],
+            'username' => ['required', 'alpha_dash', 'min:3', 'max:190', 'unique:users,username'],
+            'mobile' => ['nullable', 'string', 'max:30'],
+        ]);
+
+        $this->setup->createAdmin(
+            name: (string) $request->input('name'),
+            username: (string) $request->input('username'),
+            mobile: (string) $request->input('mobile', ''),
+            password: (string) $request->input('password'),
+        );
+
+        return redirect()->to(cardpay_setup_route('finalize'));
     }
 
     public function showFinalize(): View
@@ -115,8 +114,6 @@ final class SetupController extends Controller
 
         $result = $this->setup->finalize($validated);
 
-        // Rendered directly (not a redirect): once the lock exists any further
-        // /setup request would 404, so the success page must be THIS response.
         return view('cardpay::setup.done', $result);
     }
 }

@@ -35,5 +35,5 @@
         update <code>.env</code> now to match (the installer never edits .env). APP_KEY was not touched.
     </p>
 
-    <a class="btn" href="{{ route('login') }}">Go to admin login →</a>
+    <a class="btn" href="{{ cardpay_route('dashboard') }}">Go to CardPay panel →</a>
 @endsection

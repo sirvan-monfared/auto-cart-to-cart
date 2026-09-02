@@ -9,16 +9,16 @@ use CartBecart\CardPay\Models\BankCard;
 use CartBecart\CardPay\Models\Device;
 use CartBecart\CardPay\Models\Payment;
 use CartBecart\CardPay\Models\SmsParser;
-use CartBecart\CardPay\Tests\Support\TestUser as User;
 use CartBecart\CardPay\Models\WebhookDelivery;
 use CartBecart\CardPay\Models\WebhookEvent;
 use CartBecart\CardPay\Services\Security\Crypto;
 use CartBecart\CardPay\Services\Webhooks\HttpWebhookProcessor;
+use CartBecart\CardPay\Tests\Support\HmacRequestSigner;
+use CartBecart\CardPay\Tests\Support\TestUser as User;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use CartBecart\CardPay\Tests\Support\HmacRequestSigner;
 
 /*
 |--------------------------------------------------------------------------
@@ -188,7 +188,7 @@ describe('AC-7 remainder — admin retry of exhausted deliveries', function () {
             'next_attempt_at' => null,
         ]);
 
-        $this->post('/admin/webhooks/deliveries/'.$delivery->id.'/retry')
+        $this->post(cardpay_test_url('webhooks/deliveries/').$delivery->id.'/retry')
             ->assertRedirect()->assertSessionHas('webhook_requeued');
 
         // The admin action re-queued it (attempt history preserved). The lazy
@@ -199,7 +199,7 @@ describe('AC-7 remainder — admin retry of exhausted deliveries', function () {
 
         // A delivered one cannot be retried.
         $delivery->forceFill(['status' => 'delivered'])->save();
-        $this->post('/admin/webhooks/deliveries/'.$delivery->id.'/retry')
+        $this->post(cardpay_test_url('webhooks/deliveries/').$delivery->id.'/retry')
             ->assertRedirect()->assertSessionHas('webhook_retry_failed');
     });
 });
@@ -266,10 +266,10 @@ describe('AC-10 remainder — secrets never leak into responses', function () {
         $this->actingAs(User::factory()->create());
 
         foreach ([
-            '/admin/cards',
-            '/admin/applications',
-            '/admin/devices',
-            '/admin/settings',
+            cardpay_test_url('cards'),
+            cardpay_test_url('applications'),
+            cardpay_test_url('devices'),
+            cardpay_test_url('settings'),
         ] as $page) {
             $html = $this->get($page)->assertOk()->getContent();
 

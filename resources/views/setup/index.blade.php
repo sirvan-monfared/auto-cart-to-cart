@@ -40,17 +40,17 @@
         </li>
     </ul>
 
-    @if ($dbMigrated || $hasAdmin)
+    @if ($dbMigrated || $hasAdmin || $hasHostUsers)
         <div class="warn">
             Existing installation state detected:
             @if ($dbMigrated) database tables already exist @endif
-            @if ($dbMigrated && $hasAdmin) and @endif
-            @if ($hasAdmin) an active admin account already exists @endif.
+            @if ($dbMigrated && ($hasAdmin || $hasHostUsers)) and @endif
+            @if ($hasHostUsers) host user accounts already exist (admin step will be skipped) @elseif ($hasAdmin) an active admin account already exists @endif.
             The installer will only fill in what is missing — nothing existing will be overwritten.
         </div>
     @endif
 
     @if ($requirementsOk)
-        <a class="btn" href="{{ route('setup.admin') }}">Continue → Step 2</a>
+        <a class="btn" href="{{ cardpay_setup_route('admin') }}">Continue → Step 2</a>
     @endif
 @endsection

@@ -7,7 +7,8 @@
 //    for the dynamic __('cardpay::settings.section.'.$section) lookups.
 require __DIR__.'/vendor/autoload.php';
 
-function flattenPrefix($arr, $prefix = '') {
+function flattenPrefix($arr, $prefix = '')
+{
     $out = [];
     foreach ($arr as $k => $v) {
         $key = $prefix === '' ? $k : $prefix.'.'.$k;
@@ -17,6 +18,7 @@ function flattenPrefix($arr, $prefix = '') {
             $out[$key] = $v;
         }
     }
+
     return $out;
 }
 

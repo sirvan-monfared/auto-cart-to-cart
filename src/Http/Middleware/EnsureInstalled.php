@@ -19,7 +19,9 @@ final class EnsureInstalled
 
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->is('setup') || $request->is('setup/*')) {
+        $setupPath = cardpay_path().'/setup';
+
+        if ($request->is($setupPath) || $request->is($setupPath.'/*')) {
             if (! $this->installed()) {
                 return $next($request);
             }

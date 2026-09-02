@@ -60,7 +60,7 @@
                     <li>
                         #{{ $review->id }} — {{ $review->status }} @if ($review->internal_note)· {{ $review->internal_note }}@endif
                         @if ($review->receipt_path)
-                            · <a href="{{ route('admin.reviews.receipt', $review) }}" target="_blank" rel="noopener" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('Download receipt') }}</a>
+                            · <a href="{{ cardpay_route('reviews.receipt', $review) }}" target="_blank" rel="noopener" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('Download receipt') }}</a>
                         @endif
                     </li>
                 @empty

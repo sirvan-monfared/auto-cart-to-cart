@@ -22,12 +22,12 @@
             An active admin account already exists — this step is skipped.
             Nothing will be overwritten (adapt-safely policy).
         </div>
-        <a class="btn" href="{{ route('setup.finalize') }}">Continue → Step 4</a>
+        <a class="btn" href="{{ cardpay_setup_route('finalize') }}">Continue → Step 4</a>
     @else
         <h2>Step 3 — Create the administrator</h2>
         <p class="sub">This account signs in to the admin panel. Password must be at least 10 characters.</p>
 
-        <form method="POST" action="{{ route('setup.admin.store') }}">
+        <form method="POST" action="{{ cardpay_setup_route('admin.store') }}">
             @csrf
             <label for="name">Full name</label>
             <input id="name" type="text" name="name" required maxlength="120" value="{{ old('name') }}">

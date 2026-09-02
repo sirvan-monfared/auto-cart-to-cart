@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "cartbecart/cardpay",
+    "name": "sirvan-monfared/auto-card-to-card",
     "type": "library",
     "description": "Card-to-card payment gateway for Laravel: HMAC merchant API, hosted checkout, SMS-based matching, admin panel.",
     "keywords": [
@@ -12,13 +12,13 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "livewire/flux": "^2.13.1",
         "livewire/livewire": "^4.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
+        "laravel/fortify": "^1.37.2",
         "laravel/pint": "^1.27",
         "nunomaduro/collision": "^8.9.3",
         "orchestra/testbench": "^11.2",
@@ -29,7 +29,10 @@
         "psr-4": {
             "CartBecart\\CardPay\\": "src/",
             "CartBecart\\CardPay\\Database\\Factories\\": "src/Database/Factories/"
-        }
+        },
+        "files": [
+            "src/Support/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -39,9 +42,11 @@
     "extra": {
         "laravel": {
             "providers": [
-                "CartBecart\\CardPay\\Providers\\CardPayServiceProvider",
-                "CartBecart\\CardPay\\Providers\\CardPayFortifyServiceProvider"
-            ]
+                "CartBecart\\CardPay\\Providers\\CardPayServiceProvider"
+            ],
+            "aliases": {
+                "CardPay": "CartBecart\\CardPay\\Facades\\CardPay"
+            }
         }
     },
     "scripts": {

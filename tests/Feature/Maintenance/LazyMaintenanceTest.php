@@ -13,9 +13,9 @@ use CartBecart\CardPay\Services\Maintenance\LazyMaintenance;
 use CartBecart\CardPay\Services\Payments\PaymentExpiryService;
 use CartBecart\CardPay\Services\Payments\PaymentStateMachine;
 use CartBecart\CardPay\Services\Payments\TokenAllocator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use CartBecart\CardPay\Tests\Support\RecordingWebhookEmitter;
 use CartBecart\CardPay\Tests\Support\SpyWebhookProcessor;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 

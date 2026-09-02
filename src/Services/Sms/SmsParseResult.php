@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace CartBecart\CardPay\Services\Sms;
 
-use CartBecart\CardPay\Enums\ParseStatus;
 use Carbon\CarbonInterface;
+use CartBecart\CardPay\Enums\ParseStatus;
 
 /**
  * Immutable outcome of running one SMS through the parse pipeline (§A3).

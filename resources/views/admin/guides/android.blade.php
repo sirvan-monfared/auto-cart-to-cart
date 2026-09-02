@@ -10,7 +10,7 @@
     <div class="mt-6 max-w-3xl panel-card !rounded-2xl">
         <flux:heading size="text-base">گام ۱ — ساخت دستگاه در پنل</flux:heading>
         <ol class="mt-3 list-decimal space-y-2 ps-6 text-sm leading-7">
-            <li>به <a href="{{ route('admin.devices') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">صفحهٔ دستگاه‌ها</a> بروید و «افزودن دستگاه» را بزنید.</li>
+            <li>به <a href="{{ cardpay_route('devices') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">صفحهٔ دستگاه‌ها</a> بروید و «افزودن دستگاه» را بزنید.</li>
             <li>پلتفرم را <strong>android</strong> انتخاب کنید و دستگاه را به کارت بانکی مرتبط گره بزنید — این دستگاه فقط واریزهای همان کارت را تأیید می‌کند.</li>
             <li><code>device_key</code> و <code>device_secret</code> فقط یک بار نمایش داده می‌شوند؛ هر دو را فوراً یادداشت کنید (secret بعداً قابل بازیابی نیست و برای دیدن دوباره باید چرخش بزنید).</li>
         </ol>

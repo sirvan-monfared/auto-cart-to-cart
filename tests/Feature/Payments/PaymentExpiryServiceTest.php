@@ -9,8 +9,8 @@ use CartBecart\CardPay\Models\PaymentTokenReservation;
 use CartBecart\CardPay\Services\Payments\PaymentExpiryService;
 use CartBecart\CardPay\Services\Payments\PaymentStateMachine;
 use CartBecart\CardPay\Services\Payments\TokenAllocator;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use CartBecart\CardPay\Tests\Support\RecordingWebhookEmitter;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 

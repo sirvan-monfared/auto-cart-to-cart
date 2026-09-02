@@ -13,6 +13,7 @@ enum MatchStatus: string
     case Matched = 'matched';
     case Ambiguous = 'ambiguous';
     case ManualReview = 'manual_review';
+
     /**
      * Human-readable label, translatable via lang files.
      */
@@ -20,5 +21,4 @@ enum MatchStatus: string
     {
         return __(':value', ['value' => $this->value]);
     }
-
 }

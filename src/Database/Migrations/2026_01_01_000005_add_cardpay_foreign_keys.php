@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -26,7 +27,7 @@ return new class extends Migration
 
         // Attribution FKs point at the HOST's user table (resolvable only after
         // the host model is configured; users is the standard Laravel name).
-        $usersTable = (new ((string) config('cardpay.user.model', \App\Models\User::class)))->getTable();
+        $usersTable = (new ((string) config('cardpay.user.model', User::class)))->getTable();
 
         Schema::table('cp_bank_cards', function (Blueprint $table) {
             $table->foreign('sms_parser_id')->references('id')->on('cp_sms_parsers')->nullOnDelete();

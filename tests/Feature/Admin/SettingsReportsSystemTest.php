@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use CartBecart\CardPay\Database\Seeders\DatabaseSeeder;
 use CartBecart\CardPay\Models\Application;
 use CartBecart\CardPay\Models\AuditLog;
 use CartBecart\CardPay\Models\BankCard;
 use CartBecart\CardPay\Models\Payment;
 use CartBecart\CardPay\Models\Setting;
 use CartBecart\CardPay\Tests\Support\TestUser as User;
-use CartBecart\CardPay\Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +41,7 @@ describe('settings editor', function () {
     it('updates a whitelisted setting with type coercion', function () {
         $this->seed(DatabaseSeeder::class);
 
-        $this->put('/admin/settings', [
+        $this->put(cardpay_test_url('settings'), [
             'settings' => ['default_expiration_minutes' => '45'],
         ])->assertRedirect()->assertSessionHas('settings_ok');
 
@@ -53,7 +53,7 @@ describe('settings editor', function () {
         $this->seed(DatabaseSeeder::class);
         $before = Setting::query()->pluck('setting_value', 'setting_key')->all();
 
-        $this->put('/admin/settings', [
+        $this->put(cardpay_test_url('settings'), [
             'settings' => ['token_cooldown_minutes' => 'not-a-number'],
         ])->assertRedirect()->assertSessionHas('settings_error');
 
@@ -61,7 +61,7 @@ describe('settings editor', function () {
     });
 
     it('ignores keys outside the whitelist entirely', function () {
-        $this->put('/admin/settings', [
+        $this->put(cardpay_test_url('settings'), [
             'settings' => ['app_key_backdoor' => 'evil-value'],
         ])->assertRedirect();
 
@@ -72,7 +72,7 @@ describe('settings editor', function () {
         $this->seed(DatabaseSeeder::class);
 
         // default_token_digits is NOT publicable: its flag must stay false.
-        $this->put('/admin/settings', [
+        $this->put(cardpay_test_url('settings'), [
             'settings' => ['payment_title' => 'پرداخت فروشگاه', 'currency' => 'IRR'],
             'public' => ['payment_title' => '1', 'currency' => '1'],
         ])->assertRedirect();
@@ -106,7 +106,7 @@ describe('reports + CSV', function () {
     });
 
     it('aggregates counts and volume by status within the window', function () {
-        $this->get('/admin/reports?from='.now()->subDays(1)->toDateString().'&to='.now()->toDateString())
+        $this->get(cardpay_test_url('reports?from=').now()->subDays(1)->toDateString().'&to='.now()->toDateString())
             ->assertOk()
             // Paid: 2 payments; expired: 1; pending: 1.
             ->assertSeeInOrder([__('paid'), '2'])
@@ -114,7 +114,7 @@ describe('reports + CSV', function () {
     });
 
     it('exports CSV with a header plus one row per payment', function () {
-        $response = $this->get('/admin/reports/csv');
+        $response = $this->get(cardpay_test_url('reports/csv'));
 
         $response->assertOk()
             ->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
@@ -127,14 +127,14 @@ describe('reports + CSV', function () {
     });
 
     it('falls back to defaults on garbage dates instead of erroring', function () {
-        $this->get('/admin/reports?from=garbage&to=worse')->assertOk();
-        $this->get('/admin/reports/csv?from=garbage&to=worse')->assertOk();
+        $this->get(cardpay_test_url('reports?from=garbage&to=worse'))->assertOk();
+        $this->get(cardpay_test_url('reports/csv?from=garbage&to=worse'))->assertOk();
     });
 });
 
 describe('system page', function () {
     it('reports runtime truth without changing anything', function () {
-        $this->get('/admin/system')
+        $this->get(cardpay_test_url('system'))
             ->assertOk()
             ->assertSee('PHP')
             ->assertSee(PHP_VERSION)
@@ -144,7 +144,7 @@ describe('system page', function () {
     it('flags pending migrations when one has not run', function () {
         DB::table('migrations')->where('migration', 'like', '%000003%')->delete();
 
-        $this->get('/admin/system')
+        $this->get(cardpay_test_url('system'))
             ->assertOk()
             ->assertSee('000003', false);
     });

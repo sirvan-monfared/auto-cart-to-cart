@@ -13,6 +13,7 @@ enum ParseStatus: string
     case Parsed = 'parsed';
     case Failed = 'failed';
     case Ignored = 'ignored';
+
     /**
      * Human-readable label, translatable via lang files.
      */
@@ -20,5 +21,4 @@ enum ParseStatus: string
     {
         return __(':value', ['value' => $this->value]);
     }
-
 }

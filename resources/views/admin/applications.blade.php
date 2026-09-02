@@ -29,7 +29,7 @@
                     </div>
                     <div class="flex items-center gap-2">
                         <flux:badge color="{{ $app->is_active ? 'emerald' : 'zinc' }}">{{ $app->is_active ? 'active' : 'inactive' }}</flux:badge>
-                        <form method="POST" action="{{ route('admin.applications.rotate', $app->id) }}">
+                        <form method="POST" action="{{ cardpay_route('applications.rotate', $app->id) }}">
                             @csrf
                             <flux:button size="xs" variant="outline" type="submit">{{ __('Rotate key') }}</flux:button>
                         </form>
@@ -49,7 +49,7 @@
 
     <div class="panel-card mt-8">
         <flux:heading size="text-base">{{ __('Add application') }}</flux:heading>
-        <form method="POST" action="{{ route('admin.applications.store') }}" class="mt-3 grid gap-3 md:grid-cols-3">
+        <form method="POST" action="{{ cardpay_route('applications.store') }}" class="mt-3 grid gap-3 md:grid-cols-3">
             @csrf
             <flux:input name="name" label="{{ __('Name') }}" required />
             <flux:input name="webhook_url" label="{{ __('Webhook URL (https)') }}" />

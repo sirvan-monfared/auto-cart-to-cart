@@ -5,9 +5,9 @@ declare(strict_types=1);
 use CartBecart\CardPay\Enums\ApiErrorCode;
 use CartBecart\CardPay\Services\Security\HmacAuthenticator;
 use CartBecart\CardPay\Services\Security\HmacScheme;
+use CartBecart\CardPay\Tests\Support\HmacRequestSigner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use CartBecart\CardPay\Tests\Support\HmacRequestSigner;
 
 /*
 |--------------------------------------------------------------------------

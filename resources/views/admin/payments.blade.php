@@ -7,9 +7,9 @@
     </div>
 
     <div class="mt-4 mb-4 flex gap-2">
-        <flux:button :href="route('admin.payments')" size="xs" variant="ghost" :variant-filled="! request('status')">{{ __('All') }}</flux:button>
+        <flux:button :href="cardpay_route('payments')" size="xs" variant="ghost" :variant-filled="! request('status')">{{ __('All') }}</flux:button>
         @foreach (['pending', 'paid', 'expired', 'manual_review'] as $status)
-            <flux:button :href="route('admin.payments', ['status' => $status])" size="xs" variant="ghost" :variant-filled="request('status') === $status">
+            <flux:button :href="cardpay_route('payments', ['status' => $status])" size="xs" variant="ghost" :variant-filled="request('status') === $status">
                 {{ __(str_replace('_', ' ', $status)) }}
             </flux:button>
         @endforeach
@@ -25,7 +25,7 @@
             </flux:table.columns>
             <flux:table.rows>
                 @forelse ($payments as $payment)
-                    <flux:table.row :href="route('admin.payments.show', $payment->public_id)">
+                    <flux:table.row :href="cardpay_route('payments.show', $payment->public_id)">
                         <flux:table.cell><span class="font-mono text-xs">{{ $payment->public_id }}</span></flux:table.cell>
                         <flux:table.cell>{{ number_format($payment->payable_amount) }}</flux:table.cell>
                         <flux:table.cell><flux:badge color="{{ match ($payment->status->value) { 'paid' => 'emerald', 'pending' => 'amber', 'manual_review' => 'cyan', default => 'zinc' } }}">{{ $payment->status->label() }}</flux:badge></flux:table.cell>

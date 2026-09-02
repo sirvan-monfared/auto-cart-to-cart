@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * CardPay integration & infrastructure plane (§7.3 / §12): webhooks,
- * idempotency ledger, anti-replay nonces, rate-limit buckets, audit trail,
- * and settings.
+ * idempotency ledger, anti-replay nonces, and rate-limit buckets.
+ *
+ * The audit trail and the settings store are NOT here: they are panel-side
+ * conveniences rather than parts of the money path, so they live in
+ * Migrations/Optional and only exist when their features are enabled (§16).
  */
 return new class extends Migration
 {
@@ -95,37 +98,10 @@ return new class extends Migration
             $table->unique(['scope', 'rate_key', 'window_start'], 'cp_rate_limits_window_unique');
             $table->index('expires_at', 'cp_rate_limits_expires_idx');
         });
-
-        Schema::create('cp_audit_logs', function (Blueprint $table) {
-            $table->id();
-            $table->string('actor_type', 40);
-            $table->unsignedBigInteger('actor_id')->nullable();
-            $table->string('action', 120);
-            $table->string('entity_type', 80)->nullable();
-            $table->string('entity_id', 100)->nullable();
-            $table->text('old_values')->nullable();
-            $table->text('new_values')->nullable();
-            $table->string('ip', 64)->nullable();
-            $table->string('user_agent', 500)->nullable();
-            $table->timestamps();
-
-            $table->index(['entity_type', 'entity_id', 'created_at'], 'cp_audit_entity_idx');
-        });
-
-        Schema::create('cp_settings', function (Blueprint $table) {
-            $table->id();
-            $table->string('setting_key', 190)->unique();
-            $table->longText('setting_value')->nullable();
-            $table->string('value_type', 30)->default('string');
-            $table->boolean('is_public')->default(false);
-            $table->timestamps();
-        });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('cp_settings');
-        Schema::dropIfExists('cp_audit_logs');
         Schema::dropIfExists('cp_rate_limits');
         Schema::dropIfExists('cp_device_nonces');
         Schema::dropIfExists('cp_api_nonces');

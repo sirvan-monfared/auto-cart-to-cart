@@ -3,11 +3,10 @@
 namespace CartBecart\CardPay\Tests\Feature\Settings;
 
 use CartBecart\CardPay\Tests\Support\TestUser as User;
+use CartBecart\CardPay\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Fortify\Features;
 use Livewire\Livewire;
-use CartBecart\CardPay\Tests\TestCase;
 
 class SecurityTest extends TestCase
 {
@@ -16,16 +15,7 @@ class SecurityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
-
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-        ]);
-        Features::passkeys([
-            'confirmPassword' => true,
-        ]);
+        $this->markTestSkipped('CardPay delegates authentication and settings to the host application.');
     }
 
     public function test_security_settings_page_can_be_rendered(): void

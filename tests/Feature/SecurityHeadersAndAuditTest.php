@@ -27,7 +27,7 @@ describe('security headers (§SR-8)', function () {
         // welcome route); a payment must exist for a 200, but 404 responses
         // carry the same header set — so assert on a known-public 200 surface:
         // the setup wizard is 404'd post-install; use the login page.
-        $response = $this->get('/login');
+        $response = $this->get(cardpay_setup_test_url());
 
         $response->assertOk()
             ->assertHeader('X-Content-Type-Options', 'nosniff')

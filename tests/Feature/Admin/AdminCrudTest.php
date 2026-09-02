@@ -8,8 +8,8 @@ use CartBecart\CardPay\Models\AuditLog;
 use CartBecart\CardPay\Models\BankCard;
 use CartBecart\CardPay\Models\Device;
 use CartBecart\CardPay\Models\SmsParser;
-use CartBecart\CardPay\Tests\Support\TestUser as User;
 use CartBecart\CardPay\Services\Security\Crypto;
+use CartBecart\CardPay\Tests\Support\TestUser as User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 
@@ -46,7 +46,7 @@ afterEach(function () {
 
 describe('bank cards (§FR-4)', function () {
     it('creates a card storing the number ENCRYPTED with last-four in clear', function () {
-        $this->post('/admin/cards', [
+        $this->post(cardpay_test_url('cards'), [
             'title' => 'Main settlement card',
             'bank_name' => 'Saman',
             'card_number' => '6219861012345678',
@@ -69,7 +69,7 @@ describe('bank cards (§FR-4)', function () {
     it('deactivates instead of deleting so history stays intact', function () {
         $card = BankCard::factory()->create();
 
-        $this->delete('/admin/cards/'.$card->id)->assertRedirect();
+        $this->delete(cardpay_test_url('cards/').$card->id)->assertRedirect();
 
         expect(BankCard::query()->whereKey($card->id)->exists())->toBeTrue()
             ->and($card->fresh()->is_active)->toBeFalse()
@@ -79,13 +79,13 @@ describe('bank cards (§FR-4)', function () {
     it('re-activates a deactivated card and the audit entry is idempotent', function () {
         $card = BankCard::factory()->inactive()->create();
 
-        $this->post('/admin/cards/'.$card->id.'/activate')->assertRedirect();
+        $this->post(cardpay_test_url('cards/').$card->id.'/activate')->assertRedirect();
 
         expect($card->fresh()->is_active)->toBeTrue()
             ->and(AuditLog::query()->where('action', 'card.activated')->count())->toBe(1);
 
         // Activating again is a no-op — no duplicate audit entry.
-        $this->post('/admin/cards/'.$card->id.'/activate')->assertRedirect();
+        $this->post(cardpay_test_url('cards/').$card->id.'/activate')->assertRedirect();
         expect(AuditLog::query()->where('action', 'card.activated')->count())->toBe(1);
     });
 
@@ -93,7 +93,7 @@ describe('bank cards (§FR-4)', function () {
         BankCard::factory()->create();
         BankCard::factory()->inactive()->create();
 
-        $this->get('/admin/cards')
+        $this->get(cardpay_test_url('cards'))
             ->assertOk()
             ->assertSee(__('Edit'))
             ->assertSee(__('Edit card'))
@@ -110,7 +110,7 @@ describe('bank cards (§FR-4)', function () {
         ]);
         $rawBefore = $card->getRawOriginal('card_number_encrypted');
 
-        $this->put('/admin/cards/'.$card->id, [
+        $this->put(cardpay_test_url('cards/').$card->id, [
             'title' => 'Renamed card',
             'bank_name' => 'Mellat',
             'card_holder_name' => 'Ali Rezaei',
@@ -134,7 +134,7 @@ describe('bank cards (§FR-4)', function () {
             'card_number_last_four' => '5678',
         ]);
 
-        $this->put('/admin/cards/'.$card->id, [
+        $this->put(cardpay_test_url('cards/').$card->id, [
             'title' => $card->title,
             'bank_name' => $card->bank_name,
             'card_number' => '6037991111111111',
@@ -153,7 +153,7 @@ describe('bank cards (§FR-4)', function () {
     it('does not silently re-activate a deactivated card when editing without the flag', function () {
         $card = BankCard::factory()->inactive()->create(['title' => 'Sleeping card']);
 
-        $this->put('/admin/cards/'.$card->id, [
+        $this->put(cardpay_test_url('cards/').$card->id, [
             'title' => 'Awake card',
             'bank_name' => 'Saman',
             'card_holder_name' => 'Ali Rezaei',
@@ -166,7 +166,7 @@ describe('bank cards (§FR-4)', function () {
 
 describe('sms parsers + live test (§FR-6)', function () {
     it('creates a parser from comma-separated keywords', function () {
-        $this->post('/admin/parsers', [
+        $this->post(cardpay_test_url('parsers'), [
             'name' => 'Mellat deposit',
             'bank_name' => 'Mellat',
             'amount_regex' => '/واریز\s+(?<amount>[0-9,]+)/u',
@@ -183,7 +183,7 @@ describe('sms parsers + live test (§FR-6)', function () {
     it('live-tests a real deposit WITHOUT persisting anything new', function () {
         $before = SmsParser::query()->count();
 
-        $this->post('/admin/parsers/'.$this->parser->id.'/live-test', [
+        $this->post(cardpay_test_url('parsers/').$this->parser->id.'/live-test', [
             'test_text' => 'بانک سامان واریز مبلغ ۱٬۰۰۰٬۰۰۰ ریال به حساب شما',
             'test_sender' => '+98555',
         ])->assertRedirect()->assertSessionHas('live_test');
@@ -197,7 +197,7 @@ describe('sms parsers + live test (§FR-6)', function () {
     });
 
     it('live-test flags a withdrawal as ignored', function () {
-        $this->post('/admin/parsers/'.$this->parser->id.'/live-test', [
+        $this->post(cardpay_test_url('parsers/').$this->parser->id.'/live-test', [
             'test_text' => 'بانک سامان برداشت مبلغ ۵۰۰ ریال از حساب شما',
         ])->assertRedirect();
 
@@ -207,7 +207,7 @@ describe('sms parsers + live test (§FR-6)', function () {
 
 describe('applications + key rotation (§FR-3)', function () {
     it('creates an application and flashes the secret exactly once', function () {
-        $this->post('/admin/applications', [
+        $this->post(cardpay_test_url('applications'), [
             'name' => 'My Shop',
             'token_digits' => '3',
             'payment_expiration_minutes' => '30',
@@ -227,7 +227,7 @@ describe('applications + key rotation (§FR-3)', function () {
             ->and(Crypto::fingerprint($revealed['secret']))->toBe($key->secret_fingerprint);
 
         // Flash is consumed by the next request — never shown twice.
-        $this->get('/admin/applications');
+        $this->get(cardpay_test_url('applications'));
         expect(session('revealed_secret'))->toBeNull();
     });
 
@@ -241,7 +241,7 @@ describe('applications + key rotation (§FR-3)', function () {
             'is_active' => true,
         ]);
 
-        $this->post('/admin/applications/'.$app->id.'/rotate')->assertRedirect();
+        $this->post(cardpay_test_url('applications/').$app->id.'/rotate')->assertRedirect();
 
         expect($original->fresh()->revoked_at)->not->toBeNull()
             ->and($original->fresh()->is_active)->toBeFalse();
@@ -256,7 +256,7 @@ describe('devices (§FR-5)', function () {
     it('creates a device bound to a card, secret encrypted + shown once', function () {
         $card = BankCard::factory()->create();
 
-        $this->post('/admin/devices', [
+        $this->post(cardpay_test_url('devices'), [
             'name' => 'Kitchen phone',
             'platform' => 'android',
             'bank_card_id' => (string) $card->id,
@@ -283,13 +283,13 @@ describe('devices (§FR-5)', function () {
             'is_active' => true,
         ]);
 
-        $this->post('/admin/devices/'.$device->id.'/revoke')->assertRedirect();
+        $this->post(cardpay_test_url('devices/').$device->id.'/revoke')->assertRedirect();
 
         expect($device->fresh()->isUsable())->toBeFalse()
             ->and(AuditLog::query()->where('action', 'device.revoked')->count())->toBe(1);
 
         // Revoking again is idempotent — no duplicate audit entry.
-        $this->post('/admin/devices/'.$device->id.'/revoke')->assertRedirect();
+        $this->post(cardpay_test_url('devices/').$device->id.'/revoke')->assertRedirect();
         expect(AuditLog::query()->where('action', 'device.revoked')->count())->toBe(1);
     });
 });

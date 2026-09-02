@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CartBecart\CardPay\Support;
 
+use App\Models\User;
 use CartBecart\CardPay\Contracts\GatewayUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +24,7 @@ final class GatewayUsers
      */
     public static function model(): string
     {
-        $model = (string) config('cardpay.user.model', \App\Models\User::class);
+        $model = (string) config('cardpay.user.model', User::class);
 
         if (! is_a($model, Model::class, true)) {
             throw new \RuntimeException("cardpay.user.model [$model] must be an Eloquent model class.");

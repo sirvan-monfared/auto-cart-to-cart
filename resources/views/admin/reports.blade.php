@@ -7,11 +7,11 @@
     <x-admin.docs-button />
 </div>
 
-    <form method="GET" action="{{ route('admin.reports') }}" class="mt-4 flex items-end gap-3">
+    <form method="GET" action="{{ cardpay_route('reports') }}" class="mt-4 flex items-end gap-3">
         <flux:input type="date" name="from" :value="$from" label="{{ __('From') }}" />
         <flux:input type="date" name="to" :value="$to" label="{{ __('To') }}" />
         <flux:button variant="outline" type="submit">{{ __('Apply') }}</flux:button>
-        <flux:button :href="route('admin.reports.csv', ['from' => $from, 'to' => $to])" variant="primary">{{ __('Export CSV') }}</flux:button>
+        <flux:button :href="cardpay_route('reports.csv', ['from' => $from, 'to' => $to])" variant="primary">{{ __('Export CSV') }}</flux:button>
     </form>
 
     <flux:table class="mt-6">

@@ -11,8 +11,8 @@ use CartBecart\CardPay\Models\IncomingSms;
 use CartBecart\CardPay\Models\ManualReviewRequest;
 use CartBecart\CardPay\Models\Payment;
 use CartBecart\CardPay\Models\PaymentMatch;
-use CartBecart\CardPay\Tests\Support\TestUser as User;
 use CartBecart\CardPay\Models\WebhookEvent;
+use CartBecart\CardPay\Tests\Support\TestUser as User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -91,7 +91,7 @@ it('approves with SMS evidence: payment paid, evidence linked, cooldown set, web
     ]);
     $sms->update(['device_id' => $deviceId]);
 
-    $response = $this->post("/admin/reviews/{$this->review->id}/approve", [
+    $response = $this->post(cardpay_test_url("reviews/{$this->review->id}/approve"), [
         'sms_id' => $sms->id,
     ]);
 
@@ -107,7 +107,7 @@ it('approves with SMS evidence: payment paid, evidence linked, cooldown set, web
 });
 
 it('approves without SMS evidence (plain approval)', function () {
-    $this->post("/admin/reviews/{$this->review->id}/approve", [])
+    $this->post(cardpay_test_url("reviews/{$this->review->id}/approve"), [])
         ->assertRedirect()->assertSessionHas('decision_ok', 'approved');
 
     expect($this->payment->fresh()->status)->toBe(PaymentStatus::Paid)
@@ -117,7 +117,7 @@ it('approves without SMS evidence (plain approval)', function () {
 it('rejects a non-pending review with review_not_found', function () {
     $this->review->forceFill(['status' => 'approved'])->save();
 
-    $this->post("/admin/reviews/{$this->review->id}/approve", [])
+    $this->post(cardpay_test_url("reviews/{$this->review->id}/approve"), [])
         ->assertRedirect()->assertSessionHas('decision_error', 'review_not_found');
 
     // No money moved.
@@ -144,7 +144,7 @@ it('rejects SMS evidence from another card with invalid_sms', function () {
     ]);
     $foreignSms->update(['device_id' => $deviceId]);
 
-    $this->post("/admin/reviews/{$this->review->id}/approve", ['sms_id' => $foreignSms->id])
+    $this->post(cardpay_test_url("reviews/{$this->review->id}/approve"), ['sms_id' => $foreignSms->id])
         ->assertRedirect()->assertSessionHas('decision_error', 'invalid_sms');
 
     // Nothing confirmed on cross-card evidence.
@@ -155,7 +155,7 @@ it('fail-safes when the payment was concurrently decided: no double confirmation
     // A concurrent writer settles the payment between our read and decision.
     $this->payment->forceFill(['status' => PaymentStatus::Paid, 'paid_at' => now()])->save();
 
-    $this->post("/admin/reviews/{$this->review->id}/approve", [])
+    $this->post(cardpay_test_url("reviews/{$this->review->id}/approve"), [])
         ->assertRedirect()->assertSessionHas('decision_error', 'payment_not_reviewable');
 
     // Still paid exactly once — no duplicate webhook.
@@ -163,7 +163,7 @@ it('fail-safes when the payment was concurrently decided: no double confirmation
 });
 
 it('rejects a payment: status rejected, webhook emitted, audited', function () {
-    $this->post("/admin/reviews/{$this->review->id}/reject", ['note' => 'No transfer found.'])
+    $this->post(cardpay_test_url("reviews/{$this->review->id}/reject"), ['note' => 'No transfer found.'])
         ->assertRedirect()->assertSessionHas('decision_ok', 'rejected');
 
     expect($this->payment->fresh()->status)->toBe(PaymentStatus::Rejected)
@@ -173,6 +173,6 @@ it('rejects a payment: status rejected, webhook emitted, audited', function () {
         ->and(AuditLog::query()->where('action', 'review.rejected')->count())->toBe(1);
 
     // Rejected is terminal: a second decision attempt finds no pending review.
-    $this->post("/admin/reviews/{$this->review->id}/approve", [])
+    $this->post(cardpay_test_url("reviews/{$this->review->id}/approve"), [])
         ->assertRedirect()->assertSessionHas('decision_error', 'review_not_found');
 });

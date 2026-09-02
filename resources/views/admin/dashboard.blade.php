@@ -33,42 +33,42 @@
     </div>
 
     <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <a href="{{ route('admin.reviews') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
+        <a href="{{ cardpay_route('reviews') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
             <div>
                 <flux:text class="text-zinc-500">{{ __('Paid today (UTC)') }}</flux:text>
                 <flux:heading size="text-xl">{{ $paidToday }}</flux:heading>
             </div>
             <flux:icon.arrow-right class="size-5 text-zinc-300 transition group-hover:text-teal-600" />
         </a>
-        <a href="{{ route('admin.devices') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
+        <a href="{{ cardpay_route('devices') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
             <div>
                 <flux:text class="text-zinc-500">{{ __('Active devices') }}</flux:text>
                 <flux:heading size="text-xl">{{ $devices }}</flux:heading>
             </div>
             <flux:icon.arrow-right class="size-5 text-zinc-300 transition group-hover:text-teal-600" />
         </a>
-        <a href="{{ route('admin.reviews') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
+        <a href="{{ cardpay_route('reviews') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
             <div>
                 <flux:text class="text-zinc-500">{{ __('Pending reviews') }}</flux:text>
                 <flux:heading size="text-xl">{{ $pendingReviews }}</flux:heading>
             </div>
             <flux:icon.arrow-right class="size-5 text-zinc-300 transition group-hover:text-teal-600" />
         </a>
-        <a href="{{ route('admin.sms', ['match' => 'unmatched']) }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
+        <a href="{{ cardpay_route('sms', ['match' => 'unmatched']) }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
             <div>
                 <flux:text class="text-zinc-500">{{ __('Unmatched SMS') }}</flux:text>
                 <flux:heading size="text-xl">{{ $unmatchedSms }}</flux:heading>
             </div>
             <flux:icon.arrow-right class="size-5 text-zinc-300 transition group-hover:text-teal-600" />
         </a>
-        <a href="{{ route('admin.webhooks') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
+        <a href="{{ cardpay_route('webhooks') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
             <div>
                 <flux:text class="text-zinc-500">{{ __('Failed / exhausted webhooks') }}</flux:text>
                 <flux:heading size="text-xl">{{ $failedWebhooks }}</flux:heading>
             </div>
             <flux:icon.arrow-right class="size-5 text-zinc-300 transition group-hover:text-teal-600" />
         </a>
-        <a href="{{ route('admin.payments') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
+        <a href="{{ cardpay_route('payments') }}" class="panel-card group flex items-center justify-between transition hover:-translate-y-0.5 hover:shadow-md hover:shadow-teal-900/10">
             <div>
                 <flux:text class="text-zinc-500">{{ __('All payments') }}</flux:text>
                 <flux:heading size="text-xl">{{ __('Browse') }}</flux:heading>

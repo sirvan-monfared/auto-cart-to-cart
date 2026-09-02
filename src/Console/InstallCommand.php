@@ -4,35 +4,39 @@ declare(strict_types=1);
 
 namespace CartBecart\CardPay\Console;
 
-use CartBecart\CardPay\Contracts\GatewayUser;
+use CartBecart\CardPay\Database\Seeders\DatabaseSeeder;
+use CartBecart\CardPay\Services\Provisioning\GatewayProvisioner;
+use CartBecart\CardPay\Support\Edition;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Schema;
 
 /**
- * One-shot installer for a host application: publishes the user-migrations
- * (users-table extension, passkeys, 2FA), runs them, verifies the host User
- * model satisfies the GatewayUser contract, and prints the remaining manual
- * steps. Re-running is safe: publishes are idempotent, migrations are
- * tracked, and the contract check is a pure read.
+ * One-shot installer for a host application.
+ *
+ * Full hands off to the browser setup wizard after migrating. Lite has no
+ * wizard and no panel, so this command IS the install: it migrates, seeds the
+ * single gateway application, and prints its API credentials — the only time
+ * the secret is ever visible (§16).
  */
 final class InstallCommand extends Command
 {
-    protected $signature = 'cardpay:install {--force : Overwrite existing published migrations}';
+    protected $signature = 'cardpay:install
+        {--force : Overwrite existing published migrations}
+        {--no-seed : Skip seeding the gateway application and default parsers}';
 
-    protected $description = 'Install CardPay into this application (publish user-migrations, migrate, verify setup)';
+    protected $description = 'Install CardPay into this application (publish migrations, migrate, seed, publish assets)';
 
-    public function handle(): int
+    public function handle(GatewayProvisioner $provisioner): int
     {
-        $this->info('Installing CardPay…');
+        $this->info('Installing CardPay ('.Edition::current().' edition)…');
 
         $this->publishUserMigrations();
         $this->migrate();
-        $this->verifyUserContract();
-
-        $this->publishFortifyMigrations();
         $this->publishAssets();
+
+        if (! $this->option('no-seed')) {
+            $this->seed($provisioner);
+        }
 
         $this->printChecklist();
 
@@ -47,23 +51,13 @@ final class InstallCommand extends Command
         ]);
     }
 
-    /**
-     * Fortify's own migrations (2FA columns) are not published by default;
-     * the passkeys/2FA flow needs them.
-     */
-    private function publishFortifyMigrations(): void
+    /** Checkout needs the packaged CSS/JS/fonts in both editions. */
+    private function publishAssets(): void
     {
-        if (! Schema::hasTable('users')) {
+        if (! Edition::enabled('checkout') && ! Edition::enabled('panel')) {
             return;
         }
 
-        if (! Schema::hasColumn('users', 'two_factor_secret') && class_exists(\Laravel\Fortify\Fortify::class)) {
-            $this->call('vendor:publish', ['--tag' => 'fortify-migrations']);
-        }
-    }
-
-    private function publishAssets(): void
-    {
         $this->call('vendor:publish', ['--tag' => 'cardpay-assets']);
     }
 
@@ -75,30 +69,33 @@ final class InstallCommand extends Command
     }
 
     /**
-     * Loud, early verification of the ONE host code requirement: the user
-     * model must implement GatewayUser (via the IsGatewayUser trait).
+     * Seed defaults, then reveal the gateway credentials if this run created
+     * them. Re-running never rotates a live secret, so a second install prints
+     * nothing — use `cardpay:api-key:rotate` to recover a lost one.
      */
-    private function verifyUserContract(): void
+    private function seed(GatewayProvisioner $provisioner): void
     {
-        $model = (string) config('cardpay.user.model', \App\Models\User::class);
+        $this->info('Seeding defaults…');
 
-        if (! class_exists($model)) {
-            $this->error("cardpay.user.model class [$model] does not exist. Set CARDPAY_USER_MODEL or create the model.");
+        Artisan::call('db:seed', [
+            '--class' => DatabaseSeeder::class,
+            '--force' => true,
+        ]);
+
+        $result = $provisioner->provision();
+
+        if ($result->credentials === null) {
+            $this->line(" Gateway application [{$result->application->slug}] already exists — credentials unchanged.");
 
             return;
         }
 
-        if (is_a($model, GatewayUser::class, true)) {
-            $this->info("User model [$model] implements the GatewayUser contract.");
-
-            return;
-        }
-
-        $this->error(
-            "User model [$model] does NOT implement CartBecart\\CardPay\\Contracts\\GatewayUser.\n".
-            "  Fix: add `use CartBecart\\CardPay\\Concerns\\IsGatewayUser;` inside your User model class\n".
-            '  (and run the published user-migrations so role/is_active columns exist).'
-        );
+        $this->newLine();
+        $this->warn(' API credentials — shown ONCE, store them now:');
+        $this->line('   Application key : '.$result->application->public_key);
+        $this->line('   API public key  : '.$result->credentials->publicKey);
+        $this->line('   API secret      : '.$result->credentials->secret);
+        $this->newLine();
     }
 
     private function printChecklist(): void
@@ -106,13 +103,38 @@ final class InstallCommand extends Command
         $this->newLine();
         $this->info('CardPay install checklist — remaining manual steps:');
         $this->newLine();
-        $this->line(' 1. Add `use CartBecart\CardPay\Concerns\IsGatewayUser;` to your User model (if not already done).');
-        $this->line(' 2. Add the API exception renderer to bootstrap/app.php:');
-        $this->line('        ->withExceptions(function (Illuminate\Foundation\Configuration\Exceptions $exceptions): void {');
-        $this->line('            CartBecart\CardPay\Http\ApiExceptionRenderer::configure($exceptions);');
-        $this->line('        })');
-        $this->line(' 3. Set CARDPAY_* env vars (see config/cardpay.php) — or visit the /setup wizard.');
-        $this->line(' 4. Visit /setup in the browser to complete installation.');
+
+        $this->line(' 1. Ensure your host authentication is configured (Fortify, Breeze, etc.).');
+        $this->line(' 2. Define who may administer the gateway — override Gate::define(\'cardpay.access\', …) in AppServiceProvider if needed.');
+        $this->line(' 3. Optionally adopt IsGatewayUser on your User model for role/is_active columns.');
+        $this->line(' 4. Add the API exception renderer to bootstrap/app.php:');
+        $this->line('        CartBecart\\CardPay\\Http\\ApiExceptionRenderer::configure($exceptions);');
+
+        if (Edition::isLite()) {
+            $this->printLiteChecklist();
+
+            return;
+        }
+
+        $this->line(' 5. Set CARDPAY_PATH / CARDPAY_* env vars (see config/cardpay.php).');
+        $this->line(' 6. Visit /'.cardpay_path().'/setup in the browser to complete installation.');
+        $this->newLine();
+    }
+
+    private function printLiteChecklist(): void
+    {
+        $api = cardpay_admin_api_url();
+
+        $this->line(' 5. Add a destination bank card and a relay device:');
+        $this->line("        POST {$api}/cards");
+        $this->line("        POST {$api}/devices");
+        $this->line(' 6. Point the relay app / iOS Shortcut at:');
+        $this->line('        POST /api/v1/devices/incoming-sms  (or /shortcut-sms)');
+        $this->line(' 7. Create payments from your own code:');
+        $this->line('        CardPay::createPayment([\'amount\' => 250000], idempotencyKey: \'order-1\');');
+        $this->newLine();
+        $this->info("This is the lite edition: no bundled panel. Build your admin on {$api}/*");
+        $this->line('   Start with GET '.$api.'/features to discover what this install exposes.');
         $this->newLine();
     }
 }

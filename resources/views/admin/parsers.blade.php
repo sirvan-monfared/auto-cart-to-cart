@@ -31,7 +31,7 @@
                 </div>
 
                 {{-- Live test against THIS parser's rules --}}
-                <form method="POST" action="{{ route('admin.parsers.test', $parser->id) }}" class="mt-3 flex flex-wrap items-end gap-2">
+                <form method="POST" action="{{ cardpay_route('parsers.test', $parser->id) }}" class="mt-3 flex flex-wrap items-end gap-2">
                     @csrf
                     <flux:input name="test_sender" size="sm" placeholder="{{ __('Sender (optional)') }}" class="w-44" />
                     <flux:input name="test_text" size="sm" placeholder="{{ __('Paste a sample SMS…') }}" class="min-w-[280px] flex-1" required />
@@ -45,7 +45,7 @@
 
     <div class="panel-card mt-8">
         <flux:heading size="text-base">{{ __('Add parser') }}</flux:heading>
-        <form method="POST" action="{{ route('admin.parsers.store') }}" class="mt-3 grid gap-3 md:grid-cols-2">
+        <form method="POST" action="{{ cardpay_route('parsers.store') }}" class="mt-3 grid gap-3 md:grid-cols-2">
             @csrf
             <flux:input name="name" label="{{ __('Name') }}" required />
             <flux:input name="bank_name" label="{{ __('Bank name') }}" required />

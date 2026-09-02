@@ -3,11 +3,10 @@
 namespace CartBecart\CardPay\Tests\Feature\Auth;
 
 use CartBecart\CardPay\Tests\Support\TestUser as User;
+use CartBecart\CardPay\Tests\TestCase;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
-use Laravel\Fortify\Features;
-use CartBecart\CardPay\Tests\TestCase;
 
 class PasswordResetTest extends TestCase
 {
@@ -16,8 +15,7 @@ class PasswordResetTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->skipUnlessFortifyHas(Features::resetPasswords());
+        $this->markTestSkipped('CardPay delegates authentication and settings to the host application.');
     }
 
     public function test_reset_password_link_screen_can_be_rendered(): void

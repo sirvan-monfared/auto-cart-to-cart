@@ -7,6 +7,7 @@ namespace CartBecart\CardPay\Models;
 use CartBecart\CardPay\Casts\Encrypted;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * A rotating public/secret credential pair for an application (§FR-3).
@@ -21,8 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $secret_fingerprint
  * @property string|null $label
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $last_used_at
- * @property \Illuminate\Support\Carbon|null $revoked_at
+ * @property Carbon|null $last_used_at
+ * @property Carbon|null $revoked_at
  */
 class ApplicationApiKey extends Model
 {

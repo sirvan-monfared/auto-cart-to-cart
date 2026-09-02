@@ -1,5 +1,5 @@
 {
-    "name": "cartbecart-cardpay",
+    "name": "auto-card-to-card",
     "private": true,
     "type": "module",
     "scripts": {

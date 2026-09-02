@@ -15,7 +15,7 @@
         <flux:callout variant="danger" class="mt-4">{{ session('settings_error') }}</flux:callout>
     @endif
 
-    <form method="POST" action="{{ route('admin.settings.update') }}" class="mt-6 space-y-6">
+    <form method="POST" action="{{ cardpay_route('settings.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('PUT')
 

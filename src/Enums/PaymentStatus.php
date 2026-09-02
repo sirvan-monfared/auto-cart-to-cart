@@ -28,6 +28,7 @@ enum PaymentStatus: string
     {
         return in_array($this, [self::Paid, self::Canceled, self::Rejected], true);
     }
+
     /**
      * Human-readable label, translatable via lang files.
      */
@@ -35,5 +36,4 @@ enum PaymentStatus: string
     {
         return __(':value', ['value' => $this->value]);
     }
-
 }

@@ -23,24 +23,24 @@
             <div class="panel-card">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <a class="font-mono text-xs underline decoration-teal-300 hover:text-teal-700" href="{{ route('admin.payments.show', $review->payment?->public_id) }}">
+                        <a class="font-mono text-xs underline decoration-teal-300 hover:text-teal-700" href="{{ cardpay_route('payments.show', $review->payment?->public_id) }}">
                             {{ $review->payment?->public_id }}
                         </a>
                         <span class="ms-2 text-sm">{{ number_format($review->reported_amount ?? $review->payment?->payable_amount ?? 0) }} {{ $review->payment?->currency }}</span>
                         <span class="ms-2 text-xs text-zinc-500">{{ __('payment') }}: {{ $review->payment?->status?->label() }}</span>
                         @if ($review->receipt_path)
-                            <a href="{{ route('admin.reviews.receipt', $review) }}" target="_blank" rel="noopener"
+                            <a href="{{ cardpay_route('reviews.receipt', $review) }}" target="_blank" rel="noopener"
                                class="ms-2 text-xs font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('View receipt') }}</a>
                         @endif
                     </div>
 
-                    <form method="POST" action="{{ route('admin.reviews.approve', $review->id) }}" class="flex items-center gap-2">
+                    <form method="POST" action="{{ cardpay_route('reviews.approve', $review->id) }}" class="flex items-center gap-2">
                         @csrf
                         <input type="hidden" name="note" value="">
                         <flux:input name="sms_id" size="sm" placeholder="{{ __('SMS id (optional)') }}" class="w-40" />
                         <flux:button variant="primary" type="submit" size="sm">{{ __('Approve') }}</flux:button>
                     </form>
-                    <form method="POST" action="{{ route('admin.reviews.reject', $review->id) }}">
+                    <form method="POST" action="{{ cardpay_route('reviews.reject', $review->id) }}">
                         @csrf
                         <flux:button variant="danger" type="submit" size="sm">{{ __('Reject') }}</flux:button>
                     </form>

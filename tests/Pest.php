@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use CartBecart\CardPay\Enums\ApiErrorCode;
 use CartBecart\CardPay\Exceptions\ApiException;
+use CartBecart\CardPay\Tests\LiteTestCase;
 use CartBecart\CardPay\Tests\TestCase;
 
 /*
@@ -19,6 +20,11 @@ use CartBecart\CardPay\Tests\TestCase;
 */
 
 uses(TestCase::class)->in('Feature');
+
+// The Lite suite boots the SAME package with edition=lite. It is a sibling of
+// Feature rather than a subfolder because Pest binds one test case per tree,
+// and this way both distributions are exercised in a single run.
+uses(LiteTestCase::class)->in('Lite');
 
 /*
 |--------------------------------------------------------------------------
@@ -42,4 +48,23 @@ function expectApiError(Closure $fn, ApiErrorCode $expected): void
     }
 
     throw new RuntimeException("Expected ApiException [{$expected->value}] was not thrown.");
+}
+
+/**
+ * Build a test URL under the CardPay panel prefix.
+ */
+function cardpay_test_url(string $path = ''): string
+{
+    return cardpay_url($path);
+}
+
+/**
+ * Build a test URL for the CardPay setup wizard.
+ */
+function cardpay_setup_test_url(string $path = ''): string
+{
+    $base = cardpay_path().'/setup';
+    $path = ltrim($path, '/');
+
+    return '/'.$base.($path !== '' ? '/'.$path : '');
 }

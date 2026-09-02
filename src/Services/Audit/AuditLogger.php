@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CartBecart\CardPay\Services\Audit;
 
 use CartBecart\CardPay\Models\AuditLog;
+use CartBecart\CardPay\Support\Edition;
 use Illuminate\Http\Request;
 use Throwable;
 
@@ -21,6 +22,10 @@ use Throwable;
  *   • audit writing must never break the business operation it witnesses —
  *     a logging failure is swallowed after being reported to the log channel;
  *   • request context (IP/UA) is read opportunistically; CLI runs simply omit it.
+ *
+ * When the `audit` feature is off (the lite default) there is no cp_audit_logs
+ * table and every call is a no-op — the host application owns the activity
+ * log. Callers stay unconditional so no business code has to branch (§16).
  */
 final class AuditLogger
 {
@@ -38,6 +43,10 @@ final class AuditLogger
         ?array $old = null,
         ?array $new = null,
     ): void {
+        if (! Edition::enabled('audit')) {
+            return;
+        }
+
         try {
             AuditLog::query()->create([
                 'actor_type' => $actorType,

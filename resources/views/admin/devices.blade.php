@@ -5,9 +5,9 @@
         <flux:heading size="text-xl" level="1">{{ __('Relay devices') }}</flux:heading>
         <flux:subheading>
             {{ __('Onboarding guides') }}:
-            <a href="{{ route('admin.guides.devices.android') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('Android (HMAC)') }}</a>
+            <a href="{{ cardpay_route('guides.devices.android') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('Android (HMAC)') }}</a>
             ·
-            <a href="{{ route('admin.guides.devices.ios') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('iOS Shortcut') }}</a>
+            <a href="{{ cardpay_route('guides.devices.ios') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">{{ __('iOS Shortcut') }}</a>
         </flux:subheading>
     </div>
     <x-admin.docs-button />
@@ -40,11 +40,11 @@
                             <flux:badge color="red">{{ __('revoked') }}</flux:badge>
                         @else
                             <flux:badge color="{{ $device->is_active ? 'green' : 'zinc' }}">{{ $device->is_active ? __('active') : __('paused') }}</flux:badge>
-                            <form method="POST" action="{{ route('admin.devices.rotate', $device->id) }}">
+                            <form method="POST" action="{{ cardpay_route('devices.rotate', $device->id) }}">
                                 @csrf
                                 <flux:button size="xs" variant="outline" type="submit">{{ __('Rotate') }}</flux:button>
                             </form>
-                            <form method="POST" action="{{ route('admin.devices.revoke', $device->id) }}"
+                            <form method="POST" action="{{ cardpay_route('devices.revoke', $device->id) }}"
                                   onsubmit="return confirm('@js(__("$1Revoke permanently? The device can never relay again."))')">
                                 @csrf
                                 <flux:button size="xs" variant="danger" type="submit">{{ __('Revoke') }}</flux:button>
@@ -62,7 +62,7 @@
 
     <div class="panel-card mt-8">
         <flux:heading size="text-base">{{ __('Add device') }}</flux:heading>
-        <form method="POST" action="{{ route('admin.devices.store') }}" class="mt-3 grid gap-3 md:grid-cols-3">
+        <form method="POST" action="{{ cardpay_route('devices.store') }}" class="mt-3 grid gap-3 md:grid-cols-3">
             @csrf
             <flux:input name="name" label="{{ __('Name') }}" required />
             <flux:select name="platform" label="{{ __('Platform') }}">

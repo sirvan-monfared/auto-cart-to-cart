@@ -19,7 +19,7 @@
         <div class="error">{{ $errors->first() }}</div>
     @endif
 
-    <form method="POST" action="{{ route('setup.database') }}">
+    <form method="POST" action="{{ cardpay_setup_route('database') }}">
         @csrf
         <label for="db_host">Host</label>
         <input id="db_host" type="text" name="db_host" required value="{{ old('db_host', '127.0.0.1') }}">

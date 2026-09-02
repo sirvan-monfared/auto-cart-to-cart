@@ -11,7 +11,7 @@
     <div class="mt-6 max-w-3xl panel-card !rounded-2xl">
         <flux:heading size="text-base">گام ۱ — ساخت دستگاه در پنل</flux:heading>
         <ol class="mt-3 list-decimal space-y-2 ps-6 text-sm leading-7">
-            <li>به <a href="{{ route('admin.devices') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">صفحهٔ دستگاه‌ها</a> بروید و «افزودن دستگاه» را بزنید.</li>
+            <li>به <a href="{{ cardpay_route('devices') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">صفحهٔ دستگاه‌ها</a> بروید و «افزودن دستگاه» را بزنید.</li>
             <li>پلتفرم را <strong>ios-shortcut</strong> انتخاب کنید و دستگاه را به کارت بانکی مرتبط گره بزنید.</li>
             <li><code>device_key</code> و <code>device_secret</code> فقط یک بار نمایش داده می‌شوند — فوراً ذخیره کنید.</li>
         </ol>
@@ -53,7 +53,7 @@ Body (JSON):
     <div class="mt-4 max-w-3xl panel-card !rounded-2xl">
         <flux:heading size="text-base">گام ۳ — تست و نگهداری</flux:heading>
         <ol class="mt-3 list-decimal space-y-2 ps-6 text-sm leading-7">
-            <li>یک پرداخت آزمایشی بسازید، مبلغ دقیق را واریز کنید و میان‌بر را با «Run» دستی هم می‌توانید اجرا کنید؛ نتیجه باید در <a href="{{ route('admin.sms') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">لاگ پیامک</a> با match=matched دیده شود.</li>
+            <li>یک پرداخت آزمایشی بسازید، مبلغ دقیق را واریز کنید و میان‌بر را با «Run» دستی هم می‌توانید اجرا کنید؛ نتیجه باید در <a href="{{ cardpay_route('sms') }}" class="font-medium text-teal-700 underline decoration-teal-300 hover:text-teal-600">لاگ پیامک</a> با match=matched دیده شود.</li>
             <li>پاسخ موفق: 201 با <code>parse_status=parsed</code>؛ پیام تکراری: 200 با <code>duplicate=true</code>.</li>
             <li>چرخش رمز = صدور جفت جدید و به‌روزرسانی فوریِ دو مقدار در میان‌بر؛ رمز قبلی همان لحظه می‌میرد.</li>
         </ol>

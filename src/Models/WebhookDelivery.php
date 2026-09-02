@@ -7,6 +7,7 @@ namespace CartBecart\CardPay\Models;
 use CartBecart\CardPay\Enums\DeliveryStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * A retryable HTTP delivery attempt for a webhook event (§FR-13/§A6).
@@ -20,8 +21,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $response_body
  * @property int|null $duration_ms
  * @property string|null $error_message
- * @property \Illuminate\Support\Carbon|null $next_attempt_at
- * @property \Illuminate\Support\Carbon|null $last_attempt_at
+ * @property Carbon|null $next_attempt_at
+ * @property Carbon|null $last_attempt_at
  */
 class WebhookDelivery extends Model
 {

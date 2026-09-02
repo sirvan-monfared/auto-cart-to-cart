@@ -7,32 +7,24 @@
     <body class="min-h-screen bg-surface antialiased">
         <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-white">
             <flux:sidebar.header>
-                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+                <x-app-logo :sidebar="true" :href="cardpay_route('dashboard')" wire:navigate />
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
 
-            <flux:sidebar.nav>
-                <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
-                    </flux:sidebar.item>
-                </flux:sidebar.group>
-            </flux:sidebar.nav>
-
             @auth
-                @if (auth()->user()->isActiveAdmin())
-                    <flux:sidebar.nav>
-                        <flux:sidebar.group :heading="__('CardPay')" class="grid">
-                            <flux:sidebar.item icon="home" :href="route('admin.dashboard')" :current="request()->routeIs('admin.dashboard')" wire:navigate>
+                @can('cardpay.access')
+            <flux:sidebar.nav>
+                <flux:sidebar.group :heading="__('CardPay')" class="grid">
+                            <flux:sidebar.item icon="home" :href="cardpay_route('dashboard')" :current="cardpay_route_is('dashboard')" wire:navigate>
                                 {{ __('Overview') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="credit-card" :href="route('admin.payments')" :current="request()->routeIs('admin.payments*')" wire:navigate>
+                            <flux:sidebar.item icon="credit-card" :href="cardpay_route('payments')" :current="cardpay_route_is('payments*')" wire:navigate>
                                 {{ __('Payments') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="clipboard-document-check" :href="route('admin.reviews')" :current="request()->routeIs('admin.reviews')" wire:navigate>
+                            <flux:sidebar.item icon="clipboard-document-check" :href="cardpay_route('reviews')" :current="cardpay_route_is('reviews')" wire:navigate>
                                 {{ __('Reviews') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="chat-bubble-oval-left" :href="route('admin.sms')" :current="request()->routeIs('admin.sms')" wire:navigate>
+                            <flux:sidebar.item icon="chat-bubble-oval-left" :href="cardpay_route('sms')" :current="cardpay_route_is('sms')" wire:navigate>
                                 {{ __('SMS Log') }}
                             </flux:sidebar.item>
                         </flux:sidebar.group>
@@ -40,16 +32,16 @@
 
                     <flux:sidebar.nav>
                         <flux:sidebar.group :heading="__('Configuration')" class="grid">
-                            <flux:sidebar.item icon="wallet" :href="route('admin.cards')" :current="request()->routeIs('admin.cards')" wire:navigate>
+                            <flux:sidebar.item icon="wallet" :href="cardpay_route('cards')" :current="cardpay_route_is('cards')" wire:navigate>
                                 {{ __('Bank Cards') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="variable" :href="route('admin.parsers')" :current="request()->routeIs('admin.parsers')" wire:navigate>
+                            <flux:sidebar.item icon="variable" :href="cardpay_route('parsers')" :current="cardpay_route_is('parsers')" wire:navigate>
                                 {{ __('SMS Parsers') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="building-storefront" :href="route('admin.applications')" :current="request()->routeIs('admin.applications')" wire:navigate>
+                            <flux:sidebar.item icon="building-storefront" :href="cardpay_route('applications')" :current="cardpay_route_is('applications')" wire:navigate>
                                 {{ __('Applications') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="device-phone-mobile" :href="route('admin.devices')" :current="request()->routeIs('admin.devices')" wire:navigate>
+                            <flux:sidebar.item icon="device-phone-mobile" :href="cardpay_route('devices')" :current="cardpay_route_is('devices')" wire:navigate>
                                 {{ __('Devices') }}
                             </flux:sidebar.item>
                         </flux:sidebar.group>
@@ -57,31 +49,31 @@
 
                     <flux:sidebar.nav>
                         <flux:sidebar.group :heading="__('System')" class="grid">
-                            <flux:sidebar.item icon="signal" :href="route('admin.webhooks')" :current="request()->routeIs('admin.webhooks')" wire:navigate>
+                            <flux:sidebar.item icon="signal" :href="cardpay_route('webhooks')" :current="cardpay_route_is('webhooks')" wire:navigate>
                                 {{ __('Webhooks') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="chart-bar" :href="route('admin.reports')" :current="request()->routeIs('admin.reports')" wire:navigate>
+                            <flux:sidebar.item icon="chart-bar" :href="cardpay_route('reports')" :current="cardpay_route_is('reports')" wire:navigate>
                                 {{ __('Reports') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="cog" :href="route('admin.settings')" :current="request()->routeIs('admin.settings')" wire:navigate>
+                            <flux:sidebar.item icon="cog" :href="cardpay_route('settings')" :current="cardpay_route_is('settings')" wire:navigate>
                                 {{ __('Settings') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="shield-check" :href="route('admin.audit')" :current="request()->routeIs('admin.audit')" wire:navigate>
+                            <flux:sidebar.item icon="shield-check" :href="cardpay_route('audit')" :current="cardpay_route_is('audit')" wire:navigate>
                                 {{ __('Audit Log') }}
                             </flux:sidebar.item>
-                            <flux:sidebar.item icon="server-stack" :href="route('admin.system')" :current="request()->routeIs('admin.system')" wire:navigate>
+                            <flux:sidebar.item icon="server-stack" :href="cardpay_route('system')" :current="cardpay_route_is('system')" wire:navigate>
                                 {{ __('System') }}
                             </flux:sidebar.item>
                         </flux:sidebar.group>
                     </flux:sidebar.nav>
-                @endif
+                @endcan
             @endauth
 
             <flux:spacer />
 
             @auth
                 <flux:sidebar.nav>
-                    <flux:sidebar.item icon="book-open-text" :href="route('admin.docs')" :current="request()->routeIs('admin.docs*')" wire:navigate>
+                    <flux:sidebar.item icon="book-open-text" :href="cardpay_route('docs')" :current="cardpay_route_is('docs*')" wire:navigate>
                         {{ __('Documentation') }}
                     </flux:sidebar.item>
                 </flux:sidebar.nav>
@@ -122,13 +114,16 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
+                    @if (Route::has('profile.edit'))
                         <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
                             {{ __('Settings') }}
                         </flux:menu.item>
+                    @endif
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
 
+                    @if (Route::has('logout'))
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <flux:menu.item
@@ -141,6 +136,7 @@
                             {{ __('Log out') }}
                         </flux:menu.item>
                     </form>
+                    @endif
                 </flux:menu>
             </flux:dropdown>
         </flux:header>

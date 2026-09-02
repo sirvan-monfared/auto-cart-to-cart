@@ -8,8 +8,8 @@
 </div>
 
     <div class="mt-4 mb-4 flex gap-2">
-        <flux:button :href="route('admin.sms')" size="xs" variant="ghost" :variant-filled="! request('match')">{{ __('All') }}</flux:button>
-        <flux:button :href="route('admin.sms', ['match' => 'unmatched'])" size="xs" variant="ghost" :variant-filled="request('match') === 'unmatched'">{{ __('Unmatched only') }}</flux:button>
+        <flux:button :href="cardpay_route('sms')" size="xs" variant="ghost" :variant-filled="! request('match')">{{ __('All') }}</flux:button>
+        <flux:button :href="cardpay_route('sms', ['match' => 'unmatched'])" size="xs" variant="ghost" :variant-filled="request('match') === 'unmatched'">{{ __('Unmatched only') }}</flux:button>
     </div>
 
     <div class="panel-card !p-0 overflow-hidden">

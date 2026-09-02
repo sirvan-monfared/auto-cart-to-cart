@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CartBecart\CardPay\Concerns;
 
+use CartBecart\CardPay\Support\GatewayUsers;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -15,6 +16,6 @@ trait BelongsToGatewayUser
 {
     public function reviewer(): BelongsTo
     {
-        return $this->belongsTo(\CartBecart\CardPay\Support\GatewayUsers::model(), 'reviewed_by');
+        return $this->belongsTo(GatewayUsers::model(), 'reviewed_by');
     }
 }

@@ -15,6 +15,7 @@ enum WebhookEventType: string
     case Expired = 'payment.expired';
     case ManualReview = 'payment.manual_review';
     case Rejected = 'payment.rejected';
+
     /**
      * Human-readable label, translatable via lang files.
      */
@@ -22,5 +23,4 @@ enum WebhookEventType: string
     {
         return __(':value', ['value' => $this->value]);
     }
-
 }

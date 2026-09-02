@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 /**
  * An order awaiting card-to-card transfer confirmation — the central financial
@@ -31,14 +32,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $customer_mobile
  * @property string|null $customer_reference
  * @property PaymentStatus $status
- * @property \Illuminate\Support\Carbon $expires_at
- * @property \Illuminate\Support\Carbon|null $paid_at
- * @property \Illuminate\Support\Carbon|null $canceled_at
+ * @property Carbon $expires_at
+ * @property Carbon|null $paid_at
+ * @property Carbon|null $canceled_at
  * @property int|null $matched_sms_id
  * @property string|null $return_url
  * @property string|null $callback_url
  * @property array<string,mixed>|null $metadata_json
- * @property \Illuminate\Support\Carbon|null $created_at
+ * @property Carbon|null $created_at
  */
 class Payment extends Model
 {

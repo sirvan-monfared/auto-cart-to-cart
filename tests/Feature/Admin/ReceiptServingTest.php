@@ -64,7 +64,7 @@ it('serves an uploaded receipt with correct type and a safe filename', function 
         'receipt' => UploadedFile::fake()->createWithContent('r.pdf', "%PDF-1.4\ntrailer<<>>\n%%EOF"),
     ])->assertRedirect();
 
-    $response = $this->get('/admin/reviews/'.$this->review->id.'/receipt');
+    $response = $this->get(cardpay_test_url('reviews/').$this->review->id.'/receipt');
 
     $response->assertOk()->assertHeader('Content-Type', 'application/pdf');
     expect($response->headers->get('Content-Disposition'))
@@ -76,17 +76,17 @@ it('serves an uploaded receipt with correct type and a safe filename', function 
 });
 
 it('404s when the review has no receipt or the file is gone', function () {
-    $this->get('/admin/reviews/'.$this->review->id.'/receipt')->assertStatus(404);
+    $this->get(cardpay_test_url('reviews/').$this->review->id.'/receipt')->assertStatus(404);
 
     // Attach a path pointing at a file that does not exist.
     $this->review->forceFill(['receipt_path' => 'receipts/ghost'.bin2hex(random_bytes(10))])->save();
-    $this->get('/admin/reviews/'.$this->review->id.'/receipt')->assertStatus(404);
+    $this->get(cardpay_test_url('reviews/').$this->review->id.'/receipt')->assertStatus(404);
 });
 
 it('refuses stored paths that escape the receipts directory', function () {
     foreach (['../.env', '/absolute/path', 'logs/laravel.log'] as $bad) {
         $this->review->forceFill(['receipt_path' => $bad])->save();
-        $this->get('/admin/reviews/'.$this->review->id.'/receipt')->assertStatus(404);
+        $this->get(cardpay_test_url('reviews/').$this->review->id.'/receipt')->assertStatus(404);
     }
 
     expect(AuditLog::query()->where('action', 'receipt.downloaded')->count())->toBe(0);
@@ -101,11 +101,11 @@ it('refuses to serve files whose sniffed content is not on the allow-list', func
     $planted = collect(Storage::disk('local')->allFiles('receipts'))->first();
     $this->review->forceFill(['receipt_path' => $planted])->save();
 
-    $this->get('/admin/reviews/'.$this->review->id.'/receipt')->assertStatus(404);
+    $this->get(cardpay_test_url('reviews/').$this->review->id.'/receipt')->assertStatus(404);
 });
 
 it('blocks guests from receipt downloads', function () {
     auth()->logout();
 
-    $this->get('/admin/reviews/1/receipt')->assertRedirect(route('login'));
+    $this->get(cardpay_test_url('reviews/1/receipt'))->assertRedirect(route('login'));
 });

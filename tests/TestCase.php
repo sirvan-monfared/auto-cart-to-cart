@@ -2,63 +2,65 @@
 
 namespace CartBecart\CardPay\Tests;
 
-use CartBecart\CardPay\Providers\CardPayFortifyServiceProvider;
 use CartBecart\CardPay\Providers\CardPayServiceProvider;
+use CartBecart\CardPay\Support\Edition;
+use CartBecart\CardPay\Tests\Support\TestUser;
+use Flux\FluxServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    /**
-     * The providers the package registers in the testbench application,
-     * plus the runtime dependencies (Livewire, Fortify) that auto-discovery
-     * would normally load in a host app.
-     */
     protected function getPackageProviders($app): array
     {
         return [
-            \Livewire\LivewireServiceProvider::class,
-            \Flux\FluxServiceProvider::class,
-            \Laravel\Fortify\FortifyServiceProvider::class,
+            LivewireServiceProvider::class,
+            FluxServiceProvider::class,
             CardPayServiceProvider::class,
-            CardPayFortifyServiceProvider::class,
         ];
     }
 
-    /**
-     * Configure the testbench application (sqlite in-memory from phpunit.xml).
-     */
     protected function defineEnvironment($app): void
     {
-        $app['config']->set('cardpay.user.model', \CartBecart\CardPay\Tests\Support\TestUser::class);
+        $app['config']->set('cardpay.user.model', TestUser::class);
+        $app['config']->set('cardpay.path', 'cardpay');
+        $app['config']->set('cardpay.route_as', 'cardpay');
         $app['config']->set('app.key', 'base64:'.base64_encode(str_repeat('x', 32)));
-        $app['config']->set('fortify.features', [
-            'login',
-            'passwordReset',
-            'emailVerification',
-            'passwordConfirmation',
-            'twoFactorAuthentication',
-            'passkeys',
-        ]);
     }
 
-    /**
-     * Register the package's full migration set before RefreshDatabase's
-     * migrate:fresh runs: the "host" users/cache/jobs tables (testbench
-     * workbench), the cp_* domain tables, then the published users extension
-     * and 2FA/passkeys columns. Because these are registered as migrator
-     * paths, migrate:fresh executes them in filename order — which is
-     * dependency order.
-     */
     protected function defineDatabaseMigrations(): void
     {
         $this->loadMigrationsFrom(realpath(__DIR__.'/../vendor/orchestra/testbench-core/laravel/migrations'));
         $this->loadMigrationsFrom(realpath(__DIR__.'/../src/Database/Migrations'));
         $this->loadMigrationsFrom(realpath(__DIR__.'/../database/user-migrations'));
+
+        // Feature-scoped tables (cp_audit_logs, cp_settings). loadMigrationsFrom
+        // is not recursive, so the directory is registered explicitly; the
+        // migration itself skips whichever table its feature has turned off.
+        if (Edition::enabled('audit') || Edition::enabled('db_settings')) {
+            $this->loadMigrationsFrom(realpath(__DIR__.'/../src/Database/Migrations/Optional'));
+        }
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (! Route::has('login')) {
+            Route::get('/login', fn () => 'login')->name('login');
+        }
     }
 
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {
+        if (! class_exists(Features::class)) {
+            $this->markTestSkipped($message ?? 'Fortify is not installed.');
+
+            return;
+        }
+
         if (! Features::enabled($feature)) {
             $this->markTestSkipped($message ?? "Fortify feature [{$feature}] is not enabled.");
         }

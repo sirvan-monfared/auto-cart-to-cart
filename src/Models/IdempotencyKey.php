@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CartBecart\CardPay\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Create-replay ledger for idempotent payment creation (§A8).
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $request_hash
  * @property int|null $payment_id
  * @property array<string,mixed>|null $response_json
- * @property \Illuminate\Support\Carbon $expires_at
+ * @property Carbon $expires_at
  */
 class IdempotencyKey extends Model
 {

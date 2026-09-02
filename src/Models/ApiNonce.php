@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CartBecart\CardPay\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Merchant-API anti-replay nonce, scoped per application (§A5/§SR-4).
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property int $application_id
  * @property string $nonce
- * @property \Illuminate\Support\Carbon $expires_at
+ * @property Carbon $expires_at
  */
 class ApiNonce extends Model
 {

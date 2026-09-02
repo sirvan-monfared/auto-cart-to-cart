@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CartBecart\CardPay\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * A fixed-window rate-limit counter bucket (§A7).
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $rate_key
  * @property int $window_start
  * @property int $attempts
- * @property \Illuminate\Support\Carbon $expires_at
+ * @property Carbon $expires_at
  */
 class RateLimit extends Model
 {

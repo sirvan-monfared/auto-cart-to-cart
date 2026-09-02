@@ -8,7 +8,7 @@
 
         <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             @foreach ($sections as $key => $doc)
-                <a href="{{ route('admin.docs.show', $key) }}"
+                <a href="{{ cardpay_route('docs.show', $key) }}"
                    class="group panel-card transition hover:border-teal-400 hover:shadow-md hover:shadow-teal-900/10">
                     <div class="flex items-center gap-2">
                         <flux:icon :icon="$doc['icon']" class="h-5 w-5 text-teal-700" />
@@ -27,7 +27,7 @@
             راهنمای گام‌به‌گام اتصال گوشی مخابره‌گر پیامک، به تفکیک پلتفرم.
         </p>
         <div class="mt-4 grid gap-4 md:grid-cols-2">
-            <a href="{{ route('admin.guides.devices.android') }}"
+            <a href="{{ cardpay_route('guides.devices.android') }}"
                class="group panel-card transition hover:border-teal-400 hover:shadow-md hover:shadow-teal-900/10">
                 <div class="flex items-center gap-2">
                     <flux:icon icon="device-phone-mobile" class="h-5 w-5 text-teal-700" />
@@ -38,7 +38,7 @@
                 </p>
                 <span class="mt-2 inline-block text-sm font-medium text-teal-700 group-hover:underline">مشاهدهٔ راهنما ←</span>
             </a>
-            <a href="{{ route('admin.guides.devices.ios') }}"
+            <a href="{{ cardpay_route('guides.devices.ios') }}"
                class="group panel-card transition hover:border-teal-400 hover:shadow-md hover:shadow-teal-900/10">
                 <div class="flex items-center gap-2">
                     <flux:icon icon="device-phone-mobile" class="h-5 w-5 text-teal-700" />

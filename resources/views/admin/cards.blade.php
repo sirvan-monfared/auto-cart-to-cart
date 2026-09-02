@@ -39,13 +39,13 @@
                         <flux:table.cell>
                             <flux:badge color="{{ $card->is_active ? 'emerald' : 'zinc' }}">{{ $card->is_active ? 'active' : 'inactive' }}</flux:badge>
                             @if ($card->is_active)
-                                <form method="POST" action="{{ route('admin.cards.destroy', $card->id) }}" class="inline ms-2">
+                                <form method="POST" action="{{ cardpay_route('cards.destroy', $card->id) }}" class="inline ms-2">
                                     @csrf
                                     @method('DELETE')
                                     <flux:button size="xs" variant="ghost" type="submit">{{ __('Deactivate') }}</flux:button>
                                 </form>
                             @else
-                                <form method="POST" action="{{ route('admin.cards.activate', $card->id) }}" class="inline ms-2">
+                                <form method="POST" action="{{ cardpay_route('cards.activate', $card->id) }}" class="inline ms-2">
                                     @csrf
                                     <flux:button size="xs" variant="ghost" type="submit">{{ __('Activate') }}</flux:button>
                                 </form>
@@ -64,7 +64,7 @@
 
         <div class="panel-card">
             <flux:heading size="text-base">{{ __('Add card') }}</flux:heading>
-            <form method="POST" action="{{ route('admin.cards.store') }}" class="mt-3 flex flex-col gap-3">
+            <form method="POST" action="{{ cardpay_route('cards.store') }}" class="mt-3 flex flex-col gap-3">
                 @csrf
                 <flux:input name="title" label="{{ __('Title') }}" required />
                 <flux:input name="bank_name" label="{{ __('Bank name') }}" required />
@@ -91,7 +91,7 @@
                 <flux:subheading>{{ $card->title }} · ····{{ $card->card_number_last_four }}</flux:subheading>
             </div>
 
-            <form method="POST" action="{{ route('admin.cards.update', $card->id) }}" class="mt-4 flex flex-col gap-3">
+            <form method="POST" action="{{ cardpay_route('cards.update', $card->id) }}" class="mt-4 flex flex-col gap-3">
                 @csrf
                 @method('PUT')
                 <flux:input name="title" label="{{ __('Title') }}" :value="$card->title" required />

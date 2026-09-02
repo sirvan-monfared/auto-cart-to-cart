@@ -11,6 +11,7 @@ enum DevicePlatform: string
 {
     case Android = 'android';
     case IosShortcut = 'ios-shortcut';
+
     /**
      * Human-readable label, translatable via lang files.
      */
@@ -18,5 +19,4 @@ enum DevicePlatform: string
     {
         return __(':value', ['value' => $this->value]);
     }
-
 }

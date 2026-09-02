@@ -7,6 +7,7 @@ namespace CartBecart\CardPay\Models;
 use CartBecart\CardPay\Support\GatewayUsers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * A human decision queue entry for payments that could not be auto-confirmed
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $payment_id
  * @property int|null $incoming_sms_id
  * @property int|null $reported_amount
- * @property \Illuminate\Support\Carbon|null $approximate_paid_at
+ * @property Carbon|null $approximate_paid_at
  * @property string|null $contact_mobile
  * @property string|null $customer_note
  * @property string|null $receipt_path
@@ -24,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $internal_note
  * @property string $status
  * @property int|null $reviewed_by
- * @property \Illuminate\Support\Carbon|null $reviewed_at
+ * @property Carbon|null $reviewed_at
  */
 class ManualReviewRequest extends Model
 {

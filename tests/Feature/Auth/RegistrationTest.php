@@ -2,9 +2,8 @@
 
 namespace CartBecart\CardPay\Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Fortify\Features;
 use CartBecart\CardPay\Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class RegistrationTest extends TestCase
 {
@@ -13,8 +12,7 @@ class RegistrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->skipUnlessFortifyHas(Features::registration());
+        $this->markTestSkipped('CardPay delegates authentication and settings to the host application.');
     }
 
     public function test_registration_screen_can_be_rendered(): void
@@ -34,7 +32,7 @@ class RegistrationTest extends TestCase
         ]);
 
         $response->assertSessionHasNoErrors()
-            ->assertRedirect('/admin');
+            ->assertRedirect(cardpay_test_url());
 
         $this->assertAuthenticated();
     }

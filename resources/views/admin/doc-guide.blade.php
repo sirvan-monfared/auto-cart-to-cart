@@ -2,7 +2,7 @@
     <div dir="rtl" class="docs-rtl">
         <div class="flex items-center justify-between gap-4">
             <flux:heading size="text-xl" level="1">راهنما: {{ $doc['title'] }}</flux:heading>
-            <flux:button :href="route('admin.docs')" variant="ghost" size="sm">← فهرست راهنما</flux:button>
+            <flux:button :href="cardpay_route('docs')" variant="ghost" size="sm">← فهرست راهنما</flux:button>
         </div>
 
         <p class="mt-3 max-w-3xl leading-8 text-zinc-600">{{ $doc['intro'] }}</p>
@@ -32,7 +32,7 @@
             <div class="mt-3 flex flex-wrap gap-2">
                 @foreach ($others as $key => $other)
                     @continue($key === $section)
-                    <a href="{{ route('admin.docs.show', $key) }}"
+                    <a href="{{ cardpay_route('docs.show', $key) }}"
                        class="rounded-full border border-zinc-300 px-3 py-1 text-xs hover:border-teal-500">
                         {{ $other['title'] }}
                     </a>

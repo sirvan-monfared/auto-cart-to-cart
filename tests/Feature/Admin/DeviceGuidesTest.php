@@ -16,7 +16,7 @@ uses(RefreshDatabase::class);
 it('renders both device guides with pairing, signing recipe, and troubleshooting', function () {
     $this->actingAs(User::factory()->create());
 
-    $android = $this->get('/admin/guides/devices/android')
+    $android = $this->get(cardpay_test_url('guides/devices/android'))
         ->assertOk()
         ->assertSee('device_key')
         ->assertSee('X-Device-Signature')
@@ -25,7 +25,7 @@ it('renders both device guides with pairing, signing recipe, and troubleshooting
 
     expect($android->getContent())->toContain('dir="rtl"');
 
-    $ios = $this->get('/admin/guides/devices/ios-shortcut')
+    $ios = $this->get(cardpay_test_url('guides/devices/ios-shortcut'))
         ->assertOk()
         ->assertSee('shortcut-sms')
         ->assertSee('X-Device-Secret')
@@ -35,21 +35,21 @@ it('renders both device guides with pairing, signing recipe, and troubleshooting
     expect($ios->getContent())->toContain('dir="rtl"');
 
     // Cross-links between the two guides.
-    $android->assertSee('/admin/guides/devices/ios-shortcut');
-    $ios->assertSee('/admin/guides/devices/android');
+    $android->assertSee(cardpay_test_url('guides/devices/ios-shortcut'));
+    $ios->assertSee(cardpay_test_url('guides/devices/android'));
 });
 
 it('blocks guide pages from guests', function () {
-    $this->get('/admin/guides/devices/android')->assertRedirect(route('login'));
-    $this->get('/admin/guides/devices/ios-shortcut')->assertRedirect(route('login'));
+    $this->get(cardpay_test_url('guides/devices/android'))->assertRedirect(route('login'));
+    $this->get(cardpay_test_url('guides/devices/ios-shortcut'))->assertRedirect(route('login'));
 });
 
 it('links both device guides from the docs hub', function () {
     $this->actingAs(User::factory()->create());
 
-    $hub = $this->get('/admin/docs')->assertOk();
+    $hub = $this->get(cardpay_test_url('docs'))->assertOk();
 
     expect($hub->getContent())
-        ->toContain('/admin/guides/devices/android')
-        ->and($hub->getContent())->toContain('/admin/guides/devices/ios-shortcut');
+        ->toContain(cardpay_test_url('guides/devices/android'))
+        ->and($hub->getContent())->toContain(cardpay_test_url('guides/devices/ios-shortcut'));
 });

@@ -15,6 +15,7 @@ enum DeliveryStatus: string
     case Delivered = 'delivered';
     case Failed = 'failed';
     case Exhausted = 'exhausted';
+
     /**
      * Human-readable label, translatable via lang files.
      */
@@ -22,5 +23,4 @@ enum DeliveryStatus: string
     {
         return __(':value', ['value' => $this->value]);
     }
-
 }

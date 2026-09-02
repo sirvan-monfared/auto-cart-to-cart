@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CartBecart\CardPay\Services\Payments;
 
+use CartBecart\CardPay\Contracts\GatewayUser;
 use CartBecart\CardPay\Enums\MatchStatus;
 use CartBecart\CardPay\Enums\PaymentStatus;
 use CartBecart\CardPay\Enums\WebhookEventType;
@@ -12,7 +13,6 @@ use CartBecart\CardPay\Models\IncomingSms;
 use CartBecart\CardPay\Models\ManualReviewRequest;
 use CartBecart\CardPay\Models\Payment;
 use CartBecart\CardPay\Models\PaymentMatch;
-use CartBecart\CardPay\Contracts\GatewayUser;
 use CartBecart\CardPay\Services\Webhooks\WebhookEmitter;
 use Illuminate\Support\Facades\DB;
 use Throwable;

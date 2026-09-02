@@ -34,7 +34,7 @@
                             <div class="text-xs text-zinc-500">{{ $delivery->url }}</div>
                         </div>
                         @if (in_array($delivery->status->value, ['failed', 'exhausted'], true))
-                            <form method="POST" action="{{ route('admin.webhooks.retry', $delivery->id) }}">
+                            <form method="POST" action="{{ cardpay_route('webhooks.retry', $delivery->id) }}">
                                 @csrf
                                 <flux:button size="xs" variant="outline" type="submit">{{ __('Retry now') }}</flux:button>
                             </form>
